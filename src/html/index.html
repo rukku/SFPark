@@ -91,10 +91,6 @@
                         url: "/geoserver/ows",
                         title: "Local GeoServer"
                     },
-                    suite: {
-                        url: "http://v2.suite.opengeo.org/geoserver/ows",
-                        title: "Remote Suite GeoServer"
-                    },
                     osm: {
                         ptype: "gx_osmsource"
                     },
@@ -118,8 +114,8 @@
                     ],
                     layers: [{
                         source: "google",
-                        title: "Google Terrain",
-                        name: "TERRAIN",
+                        title: "Road Map",
+                        name: "ROADMAP",
                         group: "background"
                     }, {
                         source: "ol",
@@ -129,9 +125,13 @@
                         args: [
                             "None", {visibility: false}
                         ]
+                    }, {
+                        source: "local",
+                        name: "sfpark:spaces",
+                        selected: true
                     }],
-                    center: [0, 0],
-                    zoom: 2
+                    center: [-13629218, 4545403],
+                    zoom: 13
                 }
             });
 

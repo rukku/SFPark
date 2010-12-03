@@ -134,7 +134,7 @@
 
     <target name="war" depends="dist" description="create web archive">
         <echo>Creating WAR file.</echo>
-        <war destfile="build/FaultedEarth.war" webxml="${src}/main/webapp/WEB-INF/web.xml">
+        <war destfile="build/${ant.project.name}.war" webxml="${src}/main/webapp/WEB-INF/web.xml">
             <fileset dir="${build}"/>
         </war>
     </target>
