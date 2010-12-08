@@ -11,6 +11,12 @@ if (java.lang.System.getProperty("GXP_DEBUG")) {
     urls.push(
         [(/^\/script(\/.*)/), require("./autoloader").App(config)]
     );    
+
+    // debug specific proxy
+    urls.push(
+        [(/^\/geoserver\/(.*)/), require("./proxy").pass("http://gem.demo.opengeo.org:9080/geoserver/")]
+    );
+
 }
 
 exports.urls = urls;
