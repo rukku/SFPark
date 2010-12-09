@@ -223,3 +223,10 @@ div.map-overlay div.overlay-element {
 .gx-info-panel h2 {
     margin-top: 1em;
 }
+
+.olControlSelectFeatureActive {
+    cursor: pointer;
+}
+.olControlDrawFeatureActive {
+    cursor: crosshair;
+}
