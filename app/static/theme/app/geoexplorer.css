@@ -230,3 +230,6 @@ div.map-overlay div.overlay-element {
 .olControlDrawFeatureActive {
     cursor: crosshair;
 }
+.olControlWMSGetFeatureInfoActive {
+    cursor: pointer;
+}

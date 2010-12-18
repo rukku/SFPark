@@ -28,9 +28,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 xtype: "tabpanel",
                 region: "west",
                 width: 200,
-                collapsible: true,
                 split: true,
-                collapseMode: "mini",
                 activeTab: 0,
                 items: [{
                     id: "tree",
@@ -50,12 +48,15 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             outputTarget: "tree"
         }, {
             ptype: "gx_featuremanager",
-            id: "featuremanager"
+            id: "featuremanager",
+            paging: false
         }, {
             ptype: "gx_featureeditor",
             featureManager: "featuremanager",
             autoLoadFeatures: true,
-            actionTarget: "paneltbar"
+            actionTarget: "paneltbar",
+            toggleGroup: "main",
+            autoLoadFeatures: true
         }];
         
 
@@ -96,6 +97,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                         width: 300,
                         height: 300,
                         items: [{
+                            xtype: "gx_googlestreetviewpanel",
+                            title: "Street View"
+                        }, {
                             xtype: "container",
                             title: "Details",
                             autoScroll: true,
@@ -104,9 +108,6 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                                 autoHeight: true,
                                 source: feature.attributes
                             }]
-                        }, {
-                            xtype: "gx_googlestreetviewpanel",
-                            title: "Street View"
                         }]
                     }]
                 });
