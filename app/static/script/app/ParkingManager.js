@@ -84,27 +84,34 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             if (popup) {
                 popup.close();
             }
-            var features = event.features;
-            popup = new GeoExt.Popup({
-                location: event.xy,
-                map: this.mapPanel,
-                items: [{
-                    xtype: "tabpanel",
-                    border: false,
-                    activeTab: 0,
-                    width: 300,
-                    height: 300,
+            var feature = event.features && event.features[0];
+            if (feature) {
+                popup = new GeoExt.Popup({
+                    location: event.xy,
+                    map: this.mapPanel,
                     items: [{
-                        xtype: "panel",
-                        title: "Details",
-                        html: "details for " + features[0].fid
-                    }, {
-                        xtype: "gx_googlestreetviewpanel",
-                        title: "Street View"
+                        xtype: "tabpanel",
+                        border: false,
+                        activeTab: 0,
+                        width: 300,
+                        height: 300,
+                        items: [{
+                            xtype: "container",
+                            title: "Details",
+                            autoScroll: true,
+                            items: [{
+                                xtype: "propertygrid",
+                                autoHeight: true,
+                                source: feature.attributes
+                            }]
+                        }, {
+                            xtype: "gx_googlestreetviewpanel",
+                            title: "Street View"
+                        }]
                     }]
-                }]
-            });
-            popup.show();
+                });
+                popup.show();
+            }
         }
         
         return new GeoExt.Action({
