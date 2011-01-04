@@ -96,7 +96,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "gx_featureeditor",
             featureManager: "closuremanager",
-            actionTarget: "closure-editor.tbar"
+            actionTarget: "closure-editor.tbar",
+            toggleGroup: "main"
         }];
         
 
