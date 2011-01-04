@@ -69,7 +69,6 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             autoLoadFeatures: true,
             actionTarget: "paneltbar",
             toggleGroup: "main",
-            autoLoadFeatures: true
         }, {
             ptype: "app_parkinginfotool",
             toggleGroup: "main",
