@@ -35,7 +35,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 },
                 layoutConfig: {
                     animate: true,
-                    fill: false
+                    fill: true
                 },
                 items: [{
                     id: "tree",
@@ -51,7 +51,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "closure-editor",
                     title: "Closure Management",
-                    html: "closure management panel here"
+                    layout: "fit",
+                    tbar: []
                 }]
             }, "map"]
         }];
@@ -73,6 +74,23 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "app_parkinginfotool",
             toggleGroup: "main",
             actionTarget: "paneltbar"
+        }, {
+            ptype: "gx_featuremanager",
+            id: "closuremanager",
+            autoLoadFeatures: true,
+            autoSetLayer: false,
+            layer: {
+                source: "local",
+                name: "sfpark:closures"
+            }
+        }, {
+            ptype: "gx_featuregrid",
+            featureManager: "closuremanager",
+            outputTarget: "closure-editor"
+        }, {
+            ptype: "gx_featureeditor",
+            featureManager: "closuremanager",
+            actionTarget: "closure-editor.tbar"
         }];
         
 
