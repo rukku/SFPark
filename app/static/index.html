@@ -52,12 +52,13 @@
             OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
             OpenLayers.ImgPath = "externals/openlayers/img/";
             OpenLayers.Layer.WMS.prototype.DEFAULT_PARAMS.transparent = true;
+            OpenLayers.ProxyHost = "/proxy?url=";
 
             var app = new ParkingManager({
                 
                 sources: {
                     local: {
-                        url: "/geoserver/ows",
+                        url: "http://gem.demo.opengeo.org:9080/geoserver/ows",
                         title: "Local GeoServer"
                     },
                     osm: {

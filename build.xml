@@ -91,7 +91,7 @@
     </target>
 
     <target name="debug">
-        <java jar="${build}/ringo/run.jar" fork="true">
+        <java jar="${build}/ringo/run.jar" fork="true" failonerror="true">
             <sysproperty key="ringo.home" path="${build}/ringo"/>
             <arg path="app/main.js"/>
         </java>
