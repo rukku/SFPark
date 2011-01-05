@@ -3,6 +3,7 @@ var Request = require("ringo/webapp/request").Request;
 var MemoryStream = require("io").MemoryStream;
 var merge = require("ringo/utils/objects").merge;
 var responseForStatus = require("./util").responseForStatus;
+var defer = require("ringo/promise").defer;
 
 var app = exports.app = function(env) {
     var response;
@@ -36,19 +37,21 @@ function proxyPass(request, url, preserveHost) {
         // re-issue request
         var host = parts[2];
         var client = new Client();
+        response = defer();
         var exchange = client.request({
             url: url,
             method: request.method,
             headers: preserveHost ? merge({host: host}, request.headers) : request.headers,
-            data: request.contentLength && request.input
+            data: request.contentLength && request.input,
+            async: true,
+            complete: function() {
+                response.resolve({
+                    status: exchange.status,
+                    headers: exchange.headers,
+                    body: new MemoryStream(exchange.contentBytes)
+                });
+            }
         });
-        exchange.wait();
-        
-        response = {
-            status: exchange.status,
-            headers: exchange.headers,
-            body: new MemoryStream(exchange.contentBytes)
-        };
     }
     return response;
 }
