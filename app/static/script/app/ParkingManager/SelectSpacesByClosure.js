@@ -22,25 +22,28 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
         var closureManager = target.tools[this.closureManager];
         
         closureManager.on("layerchange", function() {
-            closureManager.featureStore.on({
-                "add": function(store, records) {
-                    var feature;
-                    for (var i=records.length-1; i>=0; --i) {
-                        feature = records[i].getFeature();
-                        if (feature.state == OpenLayers.State.INSERT) {
-                            this.setSpaces(store, records[i]);
-                        }
-                    }
+            closureManager.featureLayer.events.on({
+                "featureselected": function(evt) {
+                    evt.feature.state ?
+                        this.setSpaces(evt.feature) :
+                        this.selectSpaces(evt.feature);
                 },
-                "update": this.setSpaces,
+                "featureunselected": function(evt) {
+                    target.tools[this.spaceManager].featureStore.removeAll();
+                },
+                "featuremodified": function(evt) {
+                    this.setSpaces(evt.feature);
+                },
                 scope: this
             });
         }, this);
+
+        this.target.tools[this.spaceManager].showLayer(this.id);
     },
     
-    setSpaces: function(store, rec) {
+    setSpaces: function(feature) {
+        var closureManager = this.target.tools[this.closureManager];
         var spaceManager = this.target.tools[this.spaceManager];
-        var feature = rec.getFeature();
         var filter = new OpenLayers.Filter.Spatial({
             type: OpenLayers.Filter.Spatial.DWITHIN,
             value: feature.geometry,
@@ -51,8 +54,17 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
             for (var j=0,jj=features.length; j<jj; ++j) {
                 fids[j] = features[j].fid;
             }
+            var rec = closureManager.featureStore.getRecordFromFeature(feature);
             rec.set("spaces", fids.join(","));
         });
+    },
+    
+    selectSpaces: function(feature) {
+        if (feature.attributes.spaces) {
+            var fids = feature.attributes.spaces.split(",");
+            var filter = new OpenLayers.Filter.FeatureId({fids: fids});
+            this.target.tools[this.spaceManager].loadFeatures(filter);
+        }
     }
     
 });
