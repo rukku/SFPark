@@ -79,9 +79,19 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 source: "local",
                 name: "sfpark:spaces"
             }
+        // }, {
+        //     ptype: "gx_snappingagent",
+        //     id: "curb-snapping",
+        //     targets: [{
+        //         layer: {
+        //             source: "local",
+        //             name: "sfpark:city_curbs"
+        //         }
+        //     }]
         }, {
             ptype: "gx_featureeditor",
             featureManager: "space-manager",
+            // snappingAgent: "curb-snapping",
             autoLoadFeatures: true,
             actionTarget: "space-editor.tbar",
             toggleGroup: "main"
@@ -104,7 +114,6 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             actionTarget: "closure-editor.tbar",
             toggleGroup: "main"
         }];
-        
 
         ParkingManager.superclass.constructor.apply(this, arguments);
     }
