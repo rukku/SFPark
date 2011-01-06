@@ -13,6 +13,12 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
     
     /** api: config[closureManager]
      *  ``String`` FeatureManager for the Closures layer
+     */
+    
+    /** private: property[geomModified]
+     *  ``Object`` keys are feature ids of features with modified geometries;
+     *  value is true
+     */
     
     /** api: method[init]
      */
@@ -20,6 +26,7 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
         ParkingManager.SelectSpacesByClosure.superclass.init.apply(this, arguments);
         
         var closureManager = target.tools[this.closureManager];
+        this.geomModified = {};
         
         closureManager.on("layerchange", function() {
             closureManager.featureLayer.events.on({
@@ -32,7 +39,13 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
                     target.tools[this.spaceManager].featureStore.removeAll();
                 },
                 "featuremodified": function(evt) {
-                    this.setSpaces(evt.feature);
+                    if (!evt.feature.attributes.spaces || this.geomModified[evt.feature.id]) {
+                        delete this.geomModified[evt.feature.id];
+                        this.setSpaces(evt.feature);
+                    }
+                },
+                "vertexmodified": function(evt) {
+                    this.geomModified[evt.feature.id] = true;
                 },
                 scope: this
             });
@@ -49,12 +62,13 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
             value: feature.geometry,
             distance: 5
         });
+        var rec = closureManager.featureStore.getRecordFromFeature(feature);
+        var currentFids = (rec.get("spaces") || "").split(",");
         spaceManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
             for (var j=0,jj=features.length; j<jj; ++j) {
                 fids[j] = features[j].fid;
             }
-            var rec = closureManager.featureStore.getRecordFromFeature(feature);
             rec.set("spaces", fids.join(","));
         });
     },
