@@ -24,6 +24,12 @@ ParkingManager.AddRemoveSpaces = Ext.extend(gxp.plugins.Tool, {
         var featureManager = this.target.tools[this.featureManager];
         featureManager.featureLayer.events.on({
             "beforefeaturemodified": function() {
+                // Unregister first, in case some modification cycles did not
+                // go all the way through to the "afterfeaturemodified" event.
+                // Also see http://trac.geoext.org/ticket/389 for another
+                // reason why beforefeaturemodified is called more often than
+                // afterfeaturemodified
+                target.mapPanel.map.events.unregister("click", this, this.click);
                 target.mapPanel.map.events.register("click", this, this.click);
             },
             "afterfeaturemodified": function() {
