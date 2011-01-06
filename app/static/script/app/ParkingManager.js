@@ -87,8 +87,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             toggleGroup: "main"
         }, {
             ptype: "gx_featuremanager",
-            id: "closuremanager",
+            id: "closure-manager",
             autoLoadFeatures: true,
+            paging: false,
             autoSetLayer: false,
             layer: {
                 source: "local",
@@ -96,13 +97,18 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "gx_featuregrid",
-            featureManager: "closuremanager",
+            featureManager: "closure-manager",
             outputTarget: "closure-editor"
         }, {
             ptype: "gx_featureeditor",
-            featureManager: "closuremanager",
+            excludeFields: ["spaces"],
+            featureManager: "closure-manager",
             actionTarget: "closure-editor.tbar",
             toggleGroup: "main"
+        }, {
+            ptype: "app_selectspacesbyclosure",
+            spaceManager: "space-manager",
+            closureManager: 'closure-manager'
         }];
         
 
