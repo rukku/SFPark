@@ -118,7 +118,11 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "app_selectspacesbyclosure",
             spaceManager: "space-manager",
-            closureManager: 'closure-manager'
+            closureManager: "closure-manager"
+        }, {
+            ptype: "app_addremovespaces",
+            spaceManager: "space-manager",
+            featureManager: "closure-manager"
         }];
 
         ParkingManager.superclass.constructor.apply(this, arguments);
