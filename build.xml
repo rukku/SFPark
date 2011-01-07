@@ -89,6 +89,12 @@
         </copy>
         
     </target>
+    
+    <target name="war" depends="dist">
+        <war destfile="${build}/${ant.project.name}.war" needxmlfile="false">
+            <fileset dir="${build}/${ant.project.name}/WEB-INF/app/static"/>
+        </war>
+    </target>
 
     <target name="debug">
         <java jar="${build}/ringo/run.jar" fork="true" failonerror="true">
