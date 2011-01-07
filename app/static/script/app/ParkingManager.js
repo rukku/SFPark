@@ -6,8 +6,6 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
 
     constructor: function(config) {
 
-        this.popupCache = {};
-
         config.mapItems = [{
             xtype: "gx_zoomslider",
             vertical: true,
