@@ -7,11 +7,6 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = app_streetviewinfo */
     ptype: "app_streetviewinfo",
     
-    /** api: config[outputTarget]
-     *  ``String`` Popups created by this tool are added to the map by default.
-     */
-    outputTarget: "map",
-
     /** private: property[popup]
      *  ``GeoExt.Popup``
      */
