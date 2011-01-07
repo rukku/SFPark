@@ -62,9 +62,14 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             // TODO: make it so this works as map restrictedExtent
             extent: [-13650159, 4534735, -13609227, 4554724]
         }, {
-            ptype: "app_parkinginfotool",
+            ptype: "app_streetviewinfo",
             toggleGroup: "main",
-            actionTarget: "paneltbar"
+            actionTarget: "paneltbar",
+            infoActionTip: "Get Parking Space Info",
+            layer: {
+                source: "local",
+                name: "sfpark:spaces"
+            }
         }, {
             ptype: "gx_layertree",
             outputTarget: "tree"

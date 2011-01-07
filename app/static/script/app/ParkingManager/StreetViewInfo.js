@@ -2,10 +2,10 @@
  * @require ParkingManager.js
  */
 
-ParkingManager.ParkingInfoTool = Ext.extend(gxp.plugins.Tool, {
+ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
     
-    /** api: ptype = gx_wmsgetfeatureinfo */
-    ptype: "app_parkinginfotool",
+    /** api: ptype = app_streetviewinfo */
+    ptype: "app_streetviewinfo",
     
     /** api: config[outputTarget]
      *  ``String`` Popups created by this tool are added to the map by default.
@@ -21,7 +21,7 @@ ParkingManager.ParkingInfoTool = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for feature info action tooltip (i18n).
      */
-    infoActionTip: "Get Parking Space Info",
+    infoActionTip: "Get Info",
 
     /** api: config[streetViewTitle]
      *  ``String``
@@ -34,45 +34,39 @@ ParkingManager.ParkingInfoTool = Ext.extend(gxp.plugins.Tool, {
      *  Title for details tab (i18n).
      */
     detailsTitle: "Details",
-     
+    
     /** api: method[addActions]
      */
-    addActions: function() {
-        
-        var actions = ParkingManager.ParkingInfoTool.superclass.addActions.call(this, [
-            new GeoExt.Action({
-                tooltip: this.infoActionTip,
-                iconCls: "gx-icon-getfeatureinfo",
-                toggleGroup: this.toggleGroup,
-                enableToggle: true,
-                allowDepress: true,
-                map: this.target.mapPanel.map,
-                control: new OpenLayers.Control.WMSGetFeatureInfo({
-                    maxFeatures: 1,
-                    infoFormat: "application/vnd.ogc.gml",
-                    queryVisible: false,
-                    layers: [],
-                    eventListeners: {
-                        getfeatureinfo: this.displayPopup,
-                        scope: this
-                    }
-                })
-            })
-        ]);
+    addActions: function() {        
 
-        this.target.on({
-            ready: function() {
-                // TODO: give the app a reference to spaces layer
-                var store = this.target.mapPanel.layers;
-                var index = store.findExact("name", "sfpark:spaces");
-                var record = store.getAt(index);
-                var layer = record.getLayer();
-                this.actions[0].control.layers = [layer];
-            },
-            scope: this
+        if (!this.layer) {
+            throw new Error("Configure StreetViewInfo with layer config.");
+        }
+        
+        var action = new GeoExt.Action({
+            tooltip: this.infoActionTip,
+            iconCls: "gx-icon-getfeatureinfo",
+            toggleGroup: this.toggleGroup,
+            enableToggle: true,
+            allowDepress: true,
+            map: this.target.mapPanel.map,
+            control: new OpenLayers.Control.WMSGetFeatureInfo({
+                maxFeatures: 1,
+                infoFormat: "application/vnd.ogc.gml",
+                queryVisible: false,
+                layers: [],
+                eventListeners: {
+                    getfeatureinfo: this.displayPopup,
+                    scope: this
+                }
+            })
         });
         
-        return actions;
+        this.target.getLayerRecord(this.layer, function(record) {
+            action.control.layers = [record.getLayer()];
+        });
+
+        return ParkingManager.StreetViewInfo.superclass.addActions.call(this, [action]);
     },
 
     /** private: method[displayPopup]
@@ -116,4 +110,4 @@ ParkingManager.ParkingInfoTool = Ext.extend(gxp.plugins.Tool, {
     
 });
 
-Ext.preg(ParkingManager.ParkingInfoTool.prototype.ptype, ParkingManager.ParkingInfoTool);
+Ext.preg(ParkingManager.StreetViewInfo.prototype.ptype, ParkingManager.StreetViewInfo);
