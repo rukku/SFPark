@@ -80,14 +80,12 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "gx_snappingagent",
             id: "curb-snapping",
-            options: {
-                node: false,
-                vertex: false
-            },
             targets: [{
                 source: "local",
                 name: "sfpark:city_curbs",
-                maxResolution: 0.6
+                maxResolution: 0.6,
+                node: false,
+                vertex: false
             }]
         }, {
             ptype: "gx_featureeditor",
