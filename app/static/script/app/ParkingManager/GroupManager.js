@@ -46,6 +46,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     activate: function() {
                         var manager = tool.target.tools[tool.featureManager];
                         manager.clearFeatures();
+                    },
+                    deactivate: function() {
+                        var manager = tool.target.tools[tool.featureManager];
+                        manager.clearFeatures();
                     }
                 }
             }))()

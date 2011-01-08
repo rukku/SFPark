@@ -83,6 +83,12 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             layer: {
                 source: "local",
                 name: "sfpark:spaces"
+            },
+            symbolizer: {
+                pointRadius: 6,
+                fillColor: "red",
+                strokeWidth: 2,
+                strokeColor: "#ffcc33"
             }
         }, {
             ptype: "gx_snappingagent",
