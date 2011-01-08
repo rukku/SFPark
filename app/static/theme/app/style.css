@@ -233,3 +233,8 @@ div.map-overlay div.overlay-element {
 .olControlWMSGetFeatureInfoActive {
     cursor: pointer;
 }
+
+/* GroupManager */
+.x-btn .app-icon-boxselect, .x-menu-item .app-icon-boxselect {
+    background-image: url(img/silk/cursor.png);
+}

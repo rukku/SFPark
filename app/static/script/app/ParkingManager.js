@@ -46,7 +46,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "group-editor",
                     title: "Group Management",
-                    html: "group management panel here"
+                    layout: "fit",
+                    tbar: []
                 }, {
                     id: "closure-editor",
                     title: "Closure Management",
@@ -78,6 +79,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             id: "space-manager",
             paging: false,
             autoSetLayer: false,
+            maxFeatures: 250,
             layer: {
                 source: "local",
                 name: "sfpark:spaces"
@@ -99,6 +101,11 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             autoLoadFeatures: true,
             actionTarget: "space-editor.tbar",
             toggleGroup: "main"
+        }, {
+            ptype: "app_groupmanager",
+            actionTarget: "group-editor.tbar",
+            toggleGroup: "main",
+            featureManager: "space-manager"
         }, {
             ptype: "gx_featuremanager",
             id: "closure-manager",
