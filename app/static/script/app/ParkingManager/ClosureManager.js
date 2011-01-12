@@ -2,16 +2,16 @@
  * @require ParkingManager.js
  */
 
-ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
+ParkingManager.ClosureManager = Ext.extend(gxp.plugins.Tool, {
     
-    /** api: ptype = app_selectspacesbyclosure */
-    ptype: "app_selectspacesbyclosure",
+    /** api: ptype = app_closuremanager */
+    ptype: "app_closuremanager",
     
     /** api: config[spaceManager]
      *  ``String`` FeatureManager for the Spaces layer
      */
     
-    /** api: config[closureManager]
+    /** api: config[closureFeatureManager]
      *  ``String`` FeatureManager for the Closures layer
      */
     
@@ -23,13 +23,13 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
     /** api: method[init]
      */
     init: function(target) {
-        ParkingManager.SelectSpacesByClosure.superclass.init.apply(this, arguments);
+        ParkingManager.ClosureManager.superclass.init.apply(this, arguments);
         
-        var closureManager = target.tools[this.closureManager];
+        var closureFeatureManager = target.tools[this.closureFeatureManager];
         this.geomModified = {};
         
-        closureManager.on("layerchange", function() {
-            closureManager.featureLayer.events.on({
+        closureFeatureManager.on("layerchange", function() {
+            closureFeatureManager.featureLayer.events.on({
                 "featureselected": function(evt) {
                     evt.feature.state ?
                         this.setSpaces(evt.feature) :
@@ -55,14 +55,14 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
     },
     
     setSpaces: function(feature) {
-        var closureManager = this.target.tools[this.closureManager];
+        var closureFeatureManager = this.target.tools[this.closureFeatureManager];
         var spaceManager = this.target.tools[this.spaceManager];
         var filter = new OpenLayers.Filter.Spatial({
             type: OpenLayers.Filter.Spatial.DWITHIN,
             value: feature.geometry,
             distance: 5
         });
-        var rec = closureManager.featureStore.getRecordFromFeature(feature);
+        var rec = closureFeatureManager.featureStore.getRecordFromFeature(feature);
         var currentFids = (rec.get("spaces") || "").split(",");
         spaceManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
@@ -83,4 +83,4 @@ ParkingManager.SelectSpacesByClosure = Ext.extend(gxp.plugins.Tool, {
     
 });
 
-Ext.preg(ParkingManager.SelectSpacesByClosure.prototype.ptype, ParkingManager.SelectSpacesByClosure);
+Ext.preg(ParkingManager.ClosureManager.prototype.ptype, ParkingManager.ClosureManager);

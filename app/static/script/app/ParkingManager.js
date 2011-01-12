@@ -119,7 +119,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             featureManager: "space-manager"
         }, {
             ptype: "gx_featuremanager",
-            id: "closure-manager",
+            id: "closure-featuremanager",
             autoActivate: false,
             autoLoadFeatures: true,
             maxFeatures: 15,
@@ -131,24 +131,24 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "gx_featuregrid",
-            featureManager: "closure-manager",
+            featureManager: "closure-featuremanager",
             outputTarget: "closure-editor",
             alwaysDisplayOnMap: true,
         }, {
             ptype: "gx_featureeditor",
             excludeFields: ["spaces"],
-            featureManager: "closure-manager",
+            featureManager: "closure-featuremanager",
             snappingAgent: "curb-snapping",
             actionTarget: "closure-editor.tbar",
             toggleGroup: "main"
         }, {
-            ptype: "app_selectspacesbyclosure",
+            ptype: "app_closuremanager",
             spaceManager: "space-manager",
-            closureManager: "closure-manager"
+            closureManager: "closure-featuremanager"
         }, {
             ptype: "app_addremovespaces",
             spaceManager: "space-manager",
-            featureManager: "closure-manager"
+            featureManager: "closure-featuremanager"
         }];
 
         ParkingManager.superclass.constructor.apply(this, arguments);
