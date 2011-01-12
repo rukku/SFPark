@@ -29,6 +29,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         this.geomModified = {};
         
         closureManager.on("layerchange", function() {
+            target.tools[this.spaceManager].featureStore.removeAll();
             closureManager.featureLayer.events.on({
                 "featureselected": function(evt) {
                     evt.feature.state ?
