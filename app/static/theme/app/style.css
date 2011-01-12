@@ -238,3 +238,12 @@ div.map-overlay div.overlay-element {
 .x-btn .app-icon-boxselect, .x-menu-item .app-icon-boxselect {
     background-image: url(img/silk/cursor.png);
 }
+.x-btn .app-icon-addgroup, .x-menu-item .app-icon-addgroup {
+    background-image: url(img/silk/add.png);
+}
+.x-action-col-icon.app-icon-removegroup {
+    width: 16px;
+    height: 16px;
+    background-image: url(img/silk/delete.png);
+}
+
