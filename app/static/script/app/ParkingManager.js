@@ -75,7 +75,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "gxp_googlegeocoder",
             outputTarget: "paneltbar",
             outputConfig: {
-                emptyText: "Search for a location ..."
+                emptyText: "Search for a location ...",
+                listEmptyText: "- no matches -"
             }
         }, {
             ptype: "gx_layertree",
