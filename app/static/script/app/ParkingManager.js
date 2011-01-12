@@ -59,9 +59,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
 
         config.tools = [{
             ptype: "gx_zoomtoextent",
-            actionTarget: "paneltbar",
-            // TODO: make it so this works as map restrictedExtent
-            extent: [-13650159, 4534735, -13609227, 4554724]
+            actionTarget: "paneltbar"
         }, {
             ptype: "app_streetviewinfo",
             toggleGroup: "main",
