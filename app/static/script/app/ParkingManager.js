@@ -72,6 +72,12 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 name: "sfpark:spaces"
             }
         }, {
+            ptype: "gxp_googlegeocoder",
+            outputTarget: "paneltbar",
+            outputConfig: {
+                emptyText: "Search for a location ..."
+            }
+        }, {
             ptype: "gx_layertree",
             outputTarget: "tree"
         }, {
