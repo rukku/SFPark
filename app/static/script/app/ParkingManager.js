@@ -46,8 +46,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "group-editor",
                     title: "Group Management",
-                    layout: "fit",
-                    tbar: []
+                    layout: "fit"
                 }, {
                     id: "closure-editor",
                     title: "Closure Management",
@@ -114,7 +113,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             toggleGroup: "main"
         }, {
             ptype: "app_groupmanager",
-            actionTarget: "group-editor.tbar",
+            outputTarget: "group-editor",
             toggleGroup: "main",
             featureManager: "space-manager"
         }, {

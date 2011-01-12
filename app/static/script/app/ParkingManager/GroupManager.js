@@ -20,9 +20,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     clickBuffer: 3,
 
-    /** api: method[addActions]
+    /** api: method[addOutput]
      */
-    addActions: function() {
+    addOutput: function() {
 
         var tool = this;
 
@@ -54,8 +54,27 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 }
             }))()
         });
+        
+        var config = {
+            xtype: "panel",
+            tbar: [box],
+            listeners: {
+                added: function(panel, container) {
+                    container.on({
+                        expand: function() {
+                            this.target.tools[this.featureManager].showLayer(this.id);
+                        },
+                        collapse: function() {
+                            this.target.tools[this.featureManager].hideLayer(this.id);
+                        },
+                        scope: this
+                    });
+                },
+                scope: this
+            }
+        };
 
-        return ParkingManager.GroupManager.superclass.addActions.call(this, [box]);
+        return ParkingManager.GroupManager.superclass.addOutput.call(this, config);
 
     },
     
