@@ -51,7 +51,29 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             });
         }, this);
 
-        this.target.tools[this.spaceManager].showLayer(this.id);
+        // use the FeatureGrid plugin for this tool's feature grid
+        new gxp.plugins.FeatureGrid({
+            featureManager: this.closureManager,
+            outputTarget: this.outputTarget,
+            alwaysDisplayOnMap: true
+        }).init(target);
+    },
+    
+    addOutput: function(config) {
+        ParkingManager.ClosureEditor.superclass.addOutput.apply(this, arguments);
+        
+        var container = Ext.getCmp(this.outputTarget) || this.target.portal[this.outputTarget];
+        container.on({
+            "expand": function() {
+                this.target.tools[this.spaceManager].showLayer(this.id);
+                this.target.tools[this.closureManager].activate();
+            },
+            "collapse": function() {
+                this.target.tools[this.spaceManager].hideLayer(this.id);
+                this.target.tools[this.closureManager].deactivate();
+            },
+            scope: this
+        });
     },
     
     setSpaces: function(feature) {
