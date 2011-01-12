@@ -6,13 +6,37 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     
     /** api: ptype = gx_wmsgetfeatureinfo */
     ptype: "app_groupmanager",
-    
-    /** api: config[boxActionTip]
+
+    /** api: config[addActionTip]
      *  ``String``
      *  Text for box selection tooltip (i18n).
      */
-    boxActionTip: "Select Features in a Box",
+    addActionTip: "Add a new group",
     
+    /** api: config[addActionText]
+     *  ``String``
+     *  Text for box selection button (i18n).
+     */
+    addActionText: "New group",
+    
+    /** api: config[modifyActionTip]
+     *  ``String``
+     *  Text for box selection tooltip (i18n).
+     */
+    modifyActionTip: "Add or remove from group",
+    
+    /** api: config[modifyActionText]
+     *  ``String``
+     *  Text for box selection button (i18n).
+     */
+    modifyActionText: "Modify selected",
+    
+    /** api: config[removeActionTip]
+     *  ``String``
+     *  Text for modify selection tooltip (i18n).
+     */
+    removeActionTip: "Remove group",
+
     /** api: config[clickBuffer]
      *  ``Number``
      *  Clicks will be treated as boxes with pixel width and height that is twice
@@ -25,9 +49,20 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     addOutput: function() {
 
         var tool = this;
+        
+        var add = new Ext.Action({
+            tooltip: this.addActionTip,
+            text: this.addActionText,
+            iconCls: "app-icon-addgroup",
+            handler: function() {
+                // add new group
+            }
+        });
 
-        var box = new GeoExt.Action({
-            tooltip: this.boxActionTip,
+        var modify = new GeoExt.Action({
+            tooltip: this.modifyActionTip,
+            disabled: true,
+            text: this.modifyActionText,
             iconCls: "app-icon-boxselect",
             toggleGroup: this.toggleGroup,
             enableToggle: true,
@@ -55,9 +90,94 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             }))()
         });
         
+        var store = new Ext.data.ArrayStore({
+            fields: [
+               {name: "title"},
+               {name: "spaces"}
+            ]
+        });
+        
+        store.loadData([
+            ["Group One", "1, 2"],
+            ["Group Two", "2, 3, 4"],
+            ["Group Three", "4, 5"],
+            ["Group Four", "1, 3, 5, 6"]
+        ]);
+        
+        var grid = new Ext.grid.EditorGridPanel({
+            border: false,
+            store: store,
+            selModel: new Ext.grid.RowSelectionModel({
+                singleSelect: true,
+                listeners: {
+                    rowselect: function(sm, rowIndex, record) {
+                        modify.enable();
+                    },
+                    rowdeselect: function(sm, rowIndex, record) {
+                        modify.disable();
+                    }
+                }
+            }),
+            autoHeight: true,
+            columns: [{
+                id: "title",
+                header: "Title",
+                dataIndex: "title",
+                sortable: true,
+                editor: {
+                    xtype: "textfield",
+                    allowBlank: false
+                }
+            }, {
+                id: "count",
+                header: "Count",
+                align: "center",
+                dataIndex: "spaces",
+                menuDisabled: true,
+                width: 50,
+                editable: false,
+                renderer: function(value) {
+                    return value.split(",").length;
+                }
+            }, {
+                xtype: "actioncolumn",
+                width: 30,
+                fixed: true,
+                menuDisabled: true,
+                hideable: false,
+                items: [{
+                    iconCls: "app-icon-removegroup",
+                    tooltip: this.removeActionTip,
+                    handler: function(grid, rowIndex) {
+                        grid.store.removeAt(rowIndex);
+                    }
+                }]
+            }],
+            autoExpandColumn: "title",
+            bbar: ["->", add, modify]
+        });
+        
         var config = {
-            xtype: "panel",
-            tbar: [box],
+            xtype: "container",
+            layout: "vbox",
+            layoutConfig: {
+                align: "stretch",
+                pack: "start"
+            },
+            items: [{
+                layout: "form",
+                border: false,
+                labelAlign: "top",
+                style: {
+                    padding: "10px"
+                },
+                items: [{
+                    xtype: "textfield",
+                    name: "keywords",
+                    fieldLabel: "Search",
+                    anchor: "95%"
+                }]
+            }, grid],
             listeners: {
                 added: function(panel, container) {
                     container.on({
