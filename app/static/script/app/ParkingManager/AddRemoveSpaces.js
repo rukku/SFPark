@@ -75,10 +75,11 @@ ParkingManager.AddRemoveSpaces = Ext.extend(gxp.plugins.Tool, {
                     var feature, existingFeature;
                     for (var i=records.length-1; i>=0; --i) {
                         feature = records[i].getFeature();
+                        var id = feature.fid.replace("spaces.", "");
                         if (spaceManager.featureLayer.getFeatureByFid(feature.fid)) {
-                            fids.remove(feature.fid);
+                            fids.remove(id);
                         } else {
-                            fids.push(feature.fid);
+                            fids.push(id);
                         }
                     }
                     var rec = featureManager.featureStore.getRecordFromFeature(selectedFeature);
