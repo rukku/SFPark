@@ -2,16 +2,16 @@
  * @require ParkingManager.js
  */
 
-ParkingManager.ClosureManager = Ext.extend(gxp.plugins.Tool, {
+ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     
-    /** api: ptype = app_closuremanager */
-    ptype: "app_closuremanager",
+    /** api: ptype = app_closureeditor */
+    ptype: "app_closureeditor",
     
     /** api: config[spaceManager]
      *  ``String`` FeatureManager for the Spaces layer
      */
     
-    /** api: config[closureFeatureManager]
+    /** api: config[closureManager]
      *  ``String`` FeatureManager for the Closures layer
      */
     
@@ -23,13 +23,13 @@ ParkingManager.ClosureManager = Ext.extend(gxp.plugins.Tool, {
     /** api: method[init]
      */
     init: function(target) {
-        ParkingManager.ClosureManager.superclass.init.apply(this, arguments);
+        ParkingManager.ClosureEditor.superclass.init.apply(this, arguments);
         
-        var closureFeatureManager = target.tools[this.closureFeatureManager];
+        var closureManager = target.tools[this.closureManager];
         this.geomModified = {};
         
-        closureFeatureManager.on("layerchange", function() {
-            closureFeatureManager.featureLayer.events.on({
+        closureManager.on("layerchange", function() {
+            closureManager.featureLayer.events.on({
                 "featureselected": function(evt) {
                     evt.feature.state ?
                         this.setSpaces(evt.feature) :
@@ -55,14 +55,14 @@ ParkingManager.ClosureManager = Ext.extend(gxp.plugins.Tool, {
     },
     
     setSpaces: function(feature) {
-        var closureFeatureManager = this.target.tools[this.closureFeatureManager];
+        var closureManager = this.target.tools[this.closureManager];
         var spaceManager = this.target.tools[this.spaceManager];
         var filter = new OpenLayers.Filter.Spatial({
             type: OpenLayers.Filter.Spatial.DWITHIN,
             value: feature.geometry,
             distance: 5
         });
-        var rec = closureFeatureManager.featureStore.getRecordFromFeature(feature);
+        var rec = closureManager.featureStore.getRecordFromFeature(feature);
         var currentFids = (rec.get("spaces") || "").split(",");
         spaceManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
@@ -83,4 +83,4 @@ ParkingManager.ClosureManager = Ext.extend(gxp.plugins.Tool, {
     
 });
 
-Ext.preg(ParkingManager.ClosureManager.prototype.ptype, ParkingManager.ClosureManager);
+Ext.preg(ParkingManager.ClosureEditor.prototype.ptype, ParkingManager.ClosureEditor);
