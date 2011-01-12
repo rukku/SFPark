@@ -4,7 +4,7 @@
 
 Prerequisites: [Ant](http://ant.apache.org/) & [Git](http://git-scm.com/)
 
-    git clone git@github.com:opengeo/SFPark.git
+    git clone git://github.com/opengeo/SFPark.git
     cd SFPark
     git submodule init
     git submodule update
