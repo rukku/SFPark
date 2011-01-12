@@ -89,8 +89,8 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         var currentFids = (rec.get("spaces") || "").split(",");
         spaceManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
-            for (var j=0,jj=features.length; j<jj; ++j) {
-                fids[j] = features[j].fid;
+            for (var i=features.length-1; i>=0; --i) {
+                fids[i] = features[i].fid.replace("spaces.", "");
             }
             rec.set("spaces", fids.join(","));
         });
@@ -99,6 +99,9 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     selectSpaces: function(feature) {
         if (feature.attributes.spaces) {
             var fids = feature.attributes.spaces.split(",");
+            for (var i=fids.length-1; i>=0; --i) {
+                fids[i] = "spaces." + fids[i];
+            }
             var filter = new OpenLayers.Filter.FeatureId({fids: fids});
             this.target.tools[this.spaceManager].loadFeatures(filter);
         }
