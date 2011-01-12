@@ -99,9 +99,6 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     selectSpaces: function(feature) {
         if (feature.attributes.spaces) {
             var fids = feature.attributes.spaces.split(",");
-            for (var i=fids.length-1; i>=0; --i) {
-                fids[i] = "spaces." + fids[i];
-            }
             var filter = new OpenLayers.Filter.FeatureId({fids: fids});
             this.target.tools[this.spaceManager].loadFeatures(filter);
         }
