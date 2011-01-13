@@ -144,11 +144,11 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             spaceManager: "space-manager",
             closureManager: "closure-manager",
             outputTarget: "closure-editor"
-        }, {
+        }/*, {
             ptype: "app_addremovespaces",
             spaceManager: "space-manager",
             featureManager: "closure-manager"
-        }];
+        }*/];
 
         ParkingManager.superclass.constructor.apply(this, arguments);
     }
@@ -166,7 +166,7 @@ OpenLayers.Format.WFST.v1_1_0.prototype.writers.wfs.Value = function(obj) {
             node.appendChild(geom);
         }
     } else {
-        node = this.createElementNSPlus("wfs:Value", {value: obj});                
+        node = this.createElementNSPlus("wfs:Value", {value: obj});
     }
     return node;
 };
