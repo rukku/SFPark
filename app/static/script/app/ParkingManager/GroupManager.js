@@ -29,7 +29,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for box selection button (i18n).
      */
-    modifyActionText: "Modify selected",
+    modifyActionText: "Modify selection",
     
     /** api: config[removeActionTip]
      *  ``String``
@@ -148,7 +148,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     write: {
                         fn: function() {
                             this.container.enable();
-                            grid.getSelectionModel().selectLastRow(false);
+                            var lastIndex = grid.getStore().getCount() - 1;
+                            grid.getSelectionModel().selectRow(lastIndex, false);
+                            grid.startEditing(lastIndex, 0);
                             modify.control.activate();
                         },
                         single: true
@@ -239,7 +241,22 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 }]
             }],
             autoExpandColumn: "title",
-            bbar: ["->", add, modify]
+            bbar: ["->", add, modify],
+            listeners: {
+                afteredit: function(event) {
+                    if (event.value !== event.original) {
+                        var feature = event.record.getFeature();
+                        if (feature.state === OpenLayers.State.INSERT) {
+                            // this should not happen if the insert succeeded
+                            event.grid.startEditing(row, col);
+                        } else {
+                            // TODO: confirm this is still necessary after http://trac.geoext.org/ticket/397
+                            feature.state = OpenLayers.State.UPDATE;
+                            event.grid.getStore().save();
+                        }
+                    }
+                }
+            }
         });
         
         this.container.add([{
