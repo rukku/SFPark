@@ -28,6 +28,8 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         var closureManager = target.tools[this.closureManager];
         this.geomModified = {};
         
+        this.featureGridTarget = Ext.id();
+        
         closureManager.on("layerchange", function() {
             target.tools[this.spaceManager].clearFeatures();
             closureManager.featureLayer.events.on({
@@ -55,13 +57,95 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         // use the FeatureGrid plugin for this tool's feature grid
         new gxp.plugins.FeatureGrid({
             featureManager: this.closureManager,
-            outputTarget: this.outputTarget,
+            outputTarget: this.featureGridTarget,
             alwaysDisplayOnMap: true
         }).init(target);
     },
     
     addOutput: function(config) {
-        ParkingManager.ClosureEditor.superclass.addOutput.apply(this, arguments);
+        var output = ParkingManager.ClosureEditor.superclass.addOutput.call(this, {
+            xtype: "container",
+            layout: "border",
+            items: [{
+                xtype: "form",
+                region: "north",
+                height: 163,
+                labelWidth: 45,
+                bodyStyle: "padding: 5px",
+                items: [{
+                    xtype: "textfield",
+                    ref: "../description",
+                    fieldLabel: "Search",
+                    anchor: "100%"
+                }, {
+                    xtype: "fieldset",
+                    title: "Date Range",
+                    labelWidth: 80,
+                    defaults: {anchor: "100%"},
+                    items: [{
+                        xtype: "datefield",
+                        ref: "../../effectiveFrom",
+                        fieldLabel: "Effective from",
+                        format: "Y-m-d"
+                    }, {
+                        xtype: "datefield",
+                        ref: "../../effectiveTo",
+                        fieldLabel: "Effective to",
+                        format: "Y-m-d"
+                    }]                    
+                }],
+                buttons: [{
+                    xtype: "button",
+                    text: "Update list",
+                    handler: function() {
+                        var filters = [];
+                        var description = output.description.getValue();
+                        var effectiveFrom = output.effectiveFrom.getValue();
+                        effectiveFrom = effectiveFrom instanceof Date ? effectiveFrom.format("Y-m-d\\Z") : "1970-01-01Z";
+                        var effectiveTo = output.effectiveTo.getValue();
+                        effectiveTo = effectiveTo instanceof Date ? effectiveTo.format("Y-m-d\\Z") : "2169-12-31Z";
+                        if (output.description.getValue()) {
+                            filters.push(new OpenLayers.Filter.Comparison({
+                                type: OpenLayers.Filter.Comparison.LIKE,
+                                property: "event_desc",
+                                value: "*" + output.description.getValue() + "*"
+                            }))
+                        }
+                        filters.push(new OpenLayers.Filter.Comparison({
+                            type: OpenLayers.Filter.Logical.OR,
+                            filters: [
+                                new OpenLayers.Filter.Comparison({
+                                    type: OpenLayers.Filter.Comparison.BETWEEN,
+                                    property: "eff_from_dt",
+                                    lowerBoundary: effectiveFrom,
+                                    upperBoundary: effectiveTo
+                                }),
+                                new OpenLayers.Filter.Comparison({
+                                    type: OpenLayers.Filter.Comparison.BETWEEN,
+                                    property: "eff_to_dt",
+                                    lowerBoundary: effectiveFrom,
+                                    upperBoundary: effectiveTo
+                                })
+                            ]
+                        }))
+                        var filter;
+                        if (filters.length) {
+                            filter = new OpenLayers.Filter.Logical({
+                                type: OpenLayers.Filter.Logical.AND,
+                                filters: filters
+                            })
+                        }
+                        this.target.tools[this.closureManager].loadFeatures(filter);
+                    },
+                    scope: this
+                }]
+            }, {
+                id: this.featureGridTarget,
+                xtype: "container",
+                region: "center",
+                layout: "fit"
+            }]
+        });
         
         var container = Ext.getCmp(this.outputTarget) || this.target.portal[this.outputTarget];
         container.on({
