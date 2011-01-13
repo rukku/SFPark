@@ -154,3 +154,19 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
     }
 
 });
+
+// TODO: remove when http://trac.osgeo.org/openlayers/ticket/3010 is addressed
+OpenLayers.Format.WFST.v1_1_0.prototype.writers.wfs.Value = function(obj) {
+    var node;
+    if(obj instanceof OpenLayers.Feature.Vector) {
+        node = this.createElementNSPlus("wfs:Value");
+        if (obj.geometry) {
+            this.srsName = this.getSrsName(obj);
+            var geom = this.writeNode("feature:_geometry", obj.geometry).firstChild;
+            node.appendChild(geom);
+        }
+    } else {
+        node = this.createElementNSPlus("wfs:Value", {value: obj});                
+    }
+    return node;
+};
