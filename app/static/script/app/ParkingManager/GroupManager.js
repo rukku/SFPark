@@ -51,6 +51,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     maxFeatures: 100,
     
+    /** private: property[selectedGroup]
+     */
+    
     /** api: method[init]
      *  :arg target: ``gxp.Viewer``
      *  Initialize the plugin.
@@ -131,8 +134,30 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             text: this.addActionText,
             iconCls: "app-icon-addgroup",
             handler: function() {
-                // add new group
-            }
+                // create a new feature
+                var feature = new OpenLayers.Feature.Vector();
+                feature.state = OpenLayers.State.INSERT;
+                var manager = this.groupFeatureManager;
+                manager.featureLayer.addFeatures([feature]);
+                this.container.disable();
+                var store = manager.featureStore;
+                
+                // save the new feature
+                store.save();
+                store.on({
+                    write: {
+                        fn: function() {
+                            this.container.enable();
+                            grid.getSelectionModel().selectLastRow(false);
+                            modify.control.activate();
+                        },
+                        single: true
+                    },
+                    scope: this
+                });
+                
+            },
+            scope: this
         });
 
         var modify = new GeoExt.Action({
@@ -163,11 +188,14 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 singleSelect: true,
                 listeners: {
                     rowselect: function(sm, rowIndex, record) {
+                        this.selectedGroup = record;
                         modify.enable();
                     },
                     rowdeselect: function(sm, rowIndex, record) {
+                        this.selectedGroup = null;
                         modify.disable();
-                    }
+                    },
+                    scope: this
                 }
             }),
             autoHeight: true,
