@@ -115,7 +115,11 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "app_groupmanager",
             outputTarget: "group-editor",
             toggleGroup: "main",
-            featureManager: "space-manager"
+            featureManager: "space-manager",
+            layer: {
+                source: "local",
+                name: "sfpark:groups"
+            }
         }, {
             ptype: "gx_featuremanager",
             id: "closure-manager",

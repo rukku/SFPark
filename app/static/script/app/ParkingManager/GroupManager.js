@@ -43,10 +43,86 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  this value.  Default is 3 (meaning a 6x6 pixel box will be used).
      */
     clickBuffer: 3,
-
-    /** api: method[addOutput]
+    
+    /** api: config[maxFeatures]
+     *  ``Number``
+     *  Maximum number of groups to request.  Default is 100.  Set to ``null`` 
+     *  for unlimited groups.
      */
-    addOutput: function() {
+    maxFeatures: 100,
+    
+    /** api: method[init]
+     *  :arg target: ``gxp.Viewer``
+     *  Initialize the plugin.
+     */
+    init: function(target) {
+        ParkingManager.GroupManager.superclass.init.apply(this, arguments);
+        
+        this.initGroupFeatureManager();
+        this.initContainer();
+    },
+    
+    /** private: method[initGroupFeatureManager]
+     *  Create the feature manager for group features.
+     */
+    initGroupFeatureManager: function() {
+        this.groupFeatureManager = new gxp.plugins.FeatureManager({
+            maxFeatures: this.maxFeatures,
+            paging: false,
+            autoLoadFeatures: true,
+            autoActivate: false,
+            layer: this.layer,
+            listeners: {
+                layerchange: function() {
+                    // featureStore is set
+                    this.addComponents();
+                },
+                scope: this
+            }
+        });
+        this.groupFeatureManager.init(this.target);
+    },
+    
+    /** private: method[initContainer]
+     *  Create the primary output container.  All other items will be added to 
+     *  this when the group feature store is ready.
+     */
+    initContainer: function() {
+        this.container = new Ext.Container({
+            layout: "vbox",
+            layoutConfig: {
+                align: "stretch",
+                pack: "start"
+            },
+            items: [],
+            listeners: {
+                added: function(panel, container) {
+                    container.on({
+                        expand: function() {
+                            this.groupFeatureManager.activate();
+                            var spacesManager = this.target.tools[this.featureManager];
+                            spacesManager.clearFeatures();
+                            spacesManager.showLayer(this.id);
+                        },
+                        collapse: function() {
+                            this.groupFeatureManager.activate();
+                            var spacesManager = this.target.tools[this.featureManager];
+                            spacesManager.clearFeatures();
+                            spacesManager.hideLayer(this.id);
+                        },
+                        scope: this
+                    });
+                },
+                scope: this
+            }
+        });
+    },
+    
+    /** private: method[addComponents]
+     *  Called when the feature store is ready.  At this point, we can add 
+     *  components to the container.
+     */
+    addComponents: function() {
 
         var tool = this;
         
@@ -76,37 +152,13 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                         }
                     });
                     OpenLayers.Control.prototype.initialize.apply(this, arguments);
-                },
-                eventListeners: {
-                    activate: function() {
-                        var manager = tool.target.tools[tool.featureManager];
-                        manager.clearFeatures();
-                    },
-                    deactivate: function() {
-                        var manager = tool.target.tools[tool.featureManager];
-                        manager.clearFeatures();
-                    }
                 }
             }))()
         });
-        
-        var store = new Ext.data.ArrayStore({
-            fields: [
-               {name: "title"},
-               {name: "spaces"}
-            ]
-        });
-        
-        store.loadData([
-            ["Group One", "1, 2"],
-            ["Group Two", "2, 3, 4"],
-            ["Group Three", "4, 5"],
-            ["Group Four", "1, 3, 5, 6"]
-        ]);
-        
+
         var grid = new Ext.grid.EditorGridPanel({
             border: false,
-            store: store,
+            store: this.groupFeatureManager.featureStore,
             selModel: new Ext.grid.RowSelectionModel({
                 singleSelect: true,
                 listeners: {
@@ -137,7 +189,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 width: 50,
                 editable: false,
                 renderer: function(value) {
-                    return value.split(",").length;
+                    return value && value.split(",").length;
                 }
             }, {
                 xtype: "actioncolumn",
@@ -157,45 +209,31 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             bbar: ["->", add, modify]
         });
         
-        var config = {
-            xtype: "container",
-            layout: "vbox",
-            layoutConfig: {
-                align: "stretch",
-                pack: "start"
+        this.container.add([{
+            layout: "form",
+            border: false,
+            labelAlign: "top",
+            style: {
+                padding: "10px"
             },
             items: [{
-                layout: "form",
-                border: false,
-                labelAlign: "top",
-                style: {
-                    padding: "10px"
-                },
-                items: [{
-                    xtype: "textfield",
-                    name: "keywords",
-                    fieldLabel: "Search",
-                    anchor: "95%"
-                }]
-            }, grid],
-            listeners: {
-                added: function(panel, container) {
-                    container.on({
-                        expand: function() {
-                            this.target.tools[this.featureManager].showLayer(this.id);
-                        },
-                        collapse: function() {
-                            this.target.tools[this.featureManager].hideLayer(this.id);
-                        },
-                        scope: this
-                    });
-                },
-                scope: this
-            }
-        };
+                xtype: "textfield",
+                name: "keywords",
+                fieldLabel: "Search",
+                anchor: "95%"
+            }]
+        }, grid]);
+        
+        if (this.container.rendered) {
+            this.container.doLayout();
+        }
 
-        return ParkingManager.GroupManager.superclass.addOutput.call(this, config);
+    },
 
+    /** api: method[addOutput]
+     */
+    addOutput: function() {
+        return ParkingManager.GroupManager.superclass.addOutput.call(this, this.container);
     },
     
     handleBoxResult: function(result) {
