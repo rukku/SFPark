@@ -229,7 +229,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     iconCls: "app-icon-removegroup",
                     tooltip: this.removeActionTip,
                     handler: function(grid, rowIndex) {
-                        grid.store.removeAt(rowIndex);
+                        var store = grid.store;
+                        store._removing = true; // TODO: remove after http://trac.geoext.org/ticket/141
+                        store.getAt(rowIndex).getFeature().state = OpenLayers.State.DELETE; // TODO: remove after http://trac.geoext.org/ticket/141
+                        store.removeAt(rowIndex);
+                        delete store._removing; // TODO: remove after http://trac.geoext.org/ticket/141
+                        store.save();
                     }
                 }]
             }],
