@@ -296,6 +296,44 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     },
     
     onFeatureLoad: function(features) {
+        var group = this.selectedGroup;
+        if (group) {
+            // gather existing ids
+            var spaceIds = {};
+            var existing = group.get("spaces");
+            if (existing) {
+                Ext.each(existing.split(","), function(id) {
+                    id = id.trim().split(".").pop();
+                    spaceIds[id] = true;
+                });
+            }
+            
+            // add new ids
+            var modified = false;
+            Ext.each(features, function(feature) {
+                var id = feature.fid.split(".").pop();
+                if (!spaceIds[id]) {
+                    modified = true;
+                    spaceIds[id] = true;
+                }
+            });
+            
+            // set new spaces property
+            var values = [];
+            for (var id in spaceIds) {
+                values.push(id);
+            }            
+            if (modified) {
+                group.set("spaces", values.join(","));
+                // TODO: remove when http://trac.geoext.org/ticket/397 is in
+                var feature = group.getFeature();
+                if (feature.state !== OpenLayers.State.INSERT) {
+                    feature.state = OpenLayers.State.UPDATE;
+                }
+                // end workaround for http://trac.geoext.org/ticket/397
+                this.groupFeatureManager.featureStore.save();
+            }
+        }
     }
 
 });
