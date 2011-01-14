@@ -36,6 +36,13 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  Text for modify selection tooltip (i18n).
      */
     removeActionTip: "Remove group",
+    
+    /** api: config[removeModifierKey]
+     *  ``String``
+     *  Modifier key to trigger removal of features from selected group.  
+     *  Default is "shiftKey".
+     */
+    removeModifierKey: "shiftKey",
 
     /** api: config[clickBuffer]
      *  ``Number``
@@ -175,7 +182,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 initialize: function() {
                     this.handler = new OpenLayers.Handler.Box(this, {
                         done: function(result) {
-                            tool.handleBoxResult(result);
+                            tool.handleBoxResult(result, this.handler.dragHandler.evt);
                         }
                     });
                     OpenLayers.Control.prototype.initialize.apply(this, arguments);
@@ -302,7 +309,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         return ParkingManager.GroupManager.superclass.addOutput.call(this, this.container);
     },
     
-    handleBoxResult: function(result) {
+    handleBoxResult: function(result, event) {
         var minX, minY, maxX, maxY;
         var buffer = this.clickBuffer;
         if (result instanceof OpenLayers.Pixel) {
@@ -326,13 +333,31 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         });
         var spaces = (this.selectedGroup.get("spaces") || "").split(",");
         if (spaces.length && spaces[0]) {
-            // take advantage of GeoServer allowing FID filter in logical filter
-            filter = new OpenLayers.Filter.Logical({
-                type: OpenLayers.Filter.Logical.OR,
-                filters: [
-                    filter, new OpenLayers.Filter.FeatureId({fids: spaces})
-                ]
-            });
+            if (event[this.removeModifierKey]) {
+                // remove from current selection
+                filter = new OpenLayers.Filter.Logical({
+                    type: OpenLayers.Filter.Logical.AND,
+                    filters: [
+                        new OpenLayers.Filter.Logical({
+                            type: OpenLayers.Filter.Logical.NOT,
+                            filters: [filter]
+                        }),
+                        new OpenLayers.Filter.Logical({
+                            type: OpenLayers.Filter.Logical.OR,
+                            filters: [new OpenLayers.Filter.FeatureId({fids: spaces})]
+                        })
+                    ]
+                });
+            } else {
+                // add to current selection
+                filter = new OpenLayers.Filter.Logical({
+                    type: OpenLayers.Filter.Logical.OR,
+                    filters: [
+                        filter, new OpenLayers.Filter.FeatureId({fids: spaces})
+                    ]
+                });
+            }
+            
         }
         var featureManager = this.target.tools[this.featureManager];
         var group = this.selectedGroup;
@@ -346,43 +371,19 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             // selection has changed, don't display spaces
             this.target.tools[this.featureManager].clearFeatures();
         } else {
-            // gather existing ids
-            var spaceIds = {};
-            var existing = group.get("spaces");
-            if (existing) {
-                Ext.each(existing.split(","), function(id) {
-                    id = id.trim().split(".").pop();
-                    if (id) {
-                        spaceIds[id] = true;
-                    }
-                });
+            var len = features.length;
+            var ids = new Array(len);
+            for (var i=0; i<len; ++i) {
+                ids[i] = features[i].fid.split(".").pop();
             }
-            
-            // add new ids
-            var modified = false;
-            Ext.each(features, function(feature) {
-                var id = feature.fid.split(".").pop();
-                if (!spaceIds[id]) {
-                    modified = true;
-                    spaceIds[id] = true;
-                }
-            });
-            
-            // set new spaces property
-            var values = [];
-            for (var id in spaceIds) {
-                values.push(id);
-            }            
-            if (modified) {
-                group.set("spaces", values.join(","));
-                // TODO: remove when http://trac.geoext.org/ticket/397 is in
-                var feature = group.getFeature();
-                if (feature.state !== OpenLayers.State.INSERT) {
-                    feature.state = OpenLayers.State.UPDATE;
-                }
-                // end workaround for http://trac.geoext.org/ticket/397
-                this.groupFeatureManager.featureStore.save();
+            group.set("spaces", ids.join(","));
+            // TODO: remove when http://trac.geoext.org/ticket/397 is in
+            var feature = group.getFeature();
+            if (feature.state !== OpenLayers.State.INSERT) {
+                feature.state = OpenLayers.State.UPDATE;
             }
+            // end workaround for http://trac.geoext.org/ticket/397
+            this.groupFeatureManager.featureStore.save();
         }
     }
 
