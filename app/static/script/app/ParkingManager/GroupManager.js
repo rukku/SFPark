@@ -36,6 +36,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  Text for modify selection tooltip (i18n).
      */
     removeActionTip: "Remove group",
+
+    /** api: config[searchLabel]
+     *  ``String``
+     *  Label for search input (i18n).
+     */
+    searchLabel: "Search",
     
     /** api: config[removeModifierKey]
      *  ``String``
@@ -280,8 +286,24 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             items: [{
                 xtype: "textfield",
                 name: "keywords",
-                fieldLabel: "Search",
-                anchor: "95%"
+                fieldLabel: this.searchLabel,
+                anchor: "95%",
+                validationDelay: 500,
+                listeners: {
+                    valid: function(field) {
+                        var filter = new OpenLayers.Filter.Comparison({
+                            type: OpenLayers.Filter.Comparison.LIKE,
+                            property: "title",
+                            value: "*" + field.getValue() + "*"
+                        });
+                        console.log("querying");
+                        this.groupFeatureManager.loadFeatures(filter);
+                    },
+                    focus: function(field) {
+                        field.reset();
+                    },
+                    scope: this
+                }
             }]
         }, grid]);
         
