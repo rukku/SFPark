@@ -83,6 +83,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             },
             outputTarget: "tree"
         }, {
+            ptype: "gxp_addlayers",
+            actionTarget: "layertree.tbar"
+        }, {
             ptype: "gx_removelayer",
             actionTarget: ["layertree.tbar", "layertree.contextMenu"]
         }, {
