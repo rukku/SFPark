@@ -84,10 +84,6 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                     width: 300,
                     height: 300,
                     items: [{
-                        xtype: "gx_googlestreetviewpanel",
-                        title: this.streetViewTitle,
-                        zoom: 1
-                    }, {
                         xtype: "container",
                         title: this.detailsTitle,
                         autoScroll: true,
@@ -96,6 +92,10 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                             autoHeight: true,
                             source: feature.attributes
                         }]
+                    }, {
+                        xtype: "gx_googlestreetviewpanel",
+                        title: this.streetViewTitle,
+                        zoom: 1
                     }]
                 }]
             });
