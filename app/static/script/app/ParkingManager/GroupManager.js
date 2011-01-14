@@ -209,6 +209,8 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     },
                     rowdeselect: function(sm, rowIndex, record) {
                         this.selectedGroup = null;
+                        this.target.tools[this.featureManager].clearFeatures();
+                        modify.control.deactivate();
                         modify.disable();
                     },
                     scope: this
