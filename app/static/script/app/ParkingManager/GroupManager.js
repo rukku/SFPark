@@ -263,8 +263,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                             // this should not happen if the insert succeeded
                             event.grid.startEditing(row, col);
                         } else {
-                            // TODO: confirm this is still necessary after http://trac.geoext.org/ticket/397
-                            feature.state = OpenLayers.State.UPDATE;
                             event.grid.getStore().save();
                         }
                     }
@@ -404,12 +402,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             }
             if (modified) {
                 group.set("spaces", ids.join(","));
-                // TODO: remove when http://trac.geoext.org/ticket/397 is in
-                var feature = group.getFeature();
-                if (feature.state !== OpenLayers.State.INSERT) {
-                    feature.state = OpenLayers.State.UPDATE;
-                }
-                // end workaround for http://trac.geoext.org/ticket/397
                 this.groupFeatureManager.featureStore.save();
             }
         }
