@@ -383,19 +383,35 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             // selection has changed, don't display spaces
             this.target.tools[this.featureManager].clearFeatures();
         } else {
+            var existing = (group.get("spaces") || "").split(",");
             var len = features.length;
             var ids = new Array(len);
+            var newIds = {};
+            var id;
             for (var i=0; i<len; ++i) {
+                id = features[i].fid.split(".").pop();
+                newIds[id] = true;
                 ids[i] = features[i].fid.split(".").pop();
             }
-            group.set("spaces", ids.join(","));
-            // TODO: remove when http://trac.geoext.org/ticket/397 is in
-            var feature = group.getFeature();
-            if (feature.state !== OpenLayers.State.INSERT) {
-                feature.state = OpenLayers.State.UPDATE;
+            var modified = (len !== existing.length);
+            if (!modified) {
+                for (i=0; i<len; ++i) {
+                    if (!(existing[i] in newIds)) {
+                        modified = true;
+                        break;
+                    }
+                }
             }
-            // end workaround for http://trac.geoext.org/ticket/397
-            this.groupFeatureManager.featureStore.save();
+            if (modified) {
+                group.set("spaces", ids.join(","));
+                // TODO: remove when http://trac.geoext.org/ticket/397 is in
+                var feature = group.getFeature();
+                if (feature.state !== OpenLayers.State.INSERT) {
+                    feature.state = OpenLayers.State.UPDATE;
+                }
+                // end workaround for http://trac.geoext.org/ticket/397
+                this.groupFeatureManager.featureStore.save();
+            }
         }
     }
 
