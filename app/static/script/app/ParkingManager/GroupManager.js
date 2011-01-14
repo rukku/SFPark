@@ -29,7 +29,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for box selection button (i18n).
      */
-    modifyActionText: "Modify selection",
+    modifyActionText: "Select spaces",
     
     /** api: config[removeActionTip]
      *  ``String``
@@ -191,6 +191,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 listeners: {
                     rowselect: function(sm, rowIndex, record) {
                         this.selectedGroup = record;
+                        this.fetchGroupSpaces(record);
                         modify.enable();
                     },
                     rowdeselect: function(sm, rowIndex, record) {
@@ -219,7 +220,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 width: 50,
                 editable: false,
                 renderer: function(value) {
-                    return value && value.split(",").length;
+                    var count = 0;
+                    if (value) {
+                        var items = value.split(",");
+                        count = items[0] ? items.length : 0;
+                    }
+                    return count;
                 }
             }, {
                 xtype: "actioncolumn",
@@ -279,6 +285,16 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         }
 
     },
+    
+    fetchGroupSpaces: function(record) {
+        var spaces = (record.get("spaces") || "").split(",");
+        if (spaces.length && spaces[0]) {
+            var filter = new OpenLayers.Filter.FeatureId({fids: spaces});
+            this.target.tools[this.featureManager].loadFeatures(filter, function(features) {
+                this.onFeatureLoad(features, record);
+            }, this);
+        }
+    },
 
     /** api: method[addOutput]
      */
@@ -308,20 +324,37 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             value: new OpenLayers.Bounds(tl.lon, br.lat, br.lon, tl.lat),
             projection: map.getProjectionObject()
         });
+        var spaces = (this.selectedGroup.get("spaces") || "").split(",");
+        if (spaces.length && spaces[0]) {
+            // take advantage of GeoServer allowing FID filter in logical filter
+            filter = new OpenLayers.Filter.Logical({
+                type: OpenLayers.Filter.Logical.OR,
+                filters: [
+                    filter, new OpenLayers.Filter.FeatureId({fids: spaces})
+                ]
+            });
+        }
         var featureManager = this.target.tools[this.featureManager];
-        featureManager.loadFeatures(filter, this.onFeatureLoad, this);
+        var group = this.selectedGroup;
+        featureManager.loadFeatures(filter, function(features) {
+            this.onFeatureLoad(features, group);
+        }, this);
     },
     
-    onFeatureLoad: function(features) {
-        var group = this.selectedGroup;
-        if (group) {
+    onFeatureLoad: function(features, group) {
+        if (group !== this.selectedGroup) {
+            // selection has changed, don't display spaces
+            this.target.tools[this.featureManager].clearFeatures();
+        } else {
             // gather existing ids
             var spaceIds = {};
             var existing = group.get("spaces");
             if (existing) {
                 Ext.each(existing.split(","), function(id) {
                     id = id.trim().split(".").pop();
-                    spaceIds[id] = true;
+                    if (id) {
+                        spaceIds[id] = true;
+                    }
                 });
             }
             
