@@ -110,7 +110,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             snappingAgent: "curb-snapping",
             autoLoadFeatures: true,
             actionTarget: "space-editor.tbar",
-            toggleGroup: "main"
+            toggleGroup: "main",
+            createFeatureActionText: "new space",
+            editFeatureActionText: "modify space"
         }, {
             ptype: "app_groupmanager",
             outputTarget: "group-editor",
@@ -138,7 +140,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             featureManager: "closure-manager",
             snappingAgent: "curb-snapping",
             actionTarget: "closure-editor.tbar",
-            toggleGroup: "main"
+            toggleGroup: "main",
+            createFeatureActionText: "new closure",
+            editFeatureActionText: "modify closure"
         }, {
             ptype: "app_closureeditor",
             spaceManager: "space-manager",
@@ -161,7 +165,7 @@ OpenLayers.Format.WFST.v1_1_0.prototype.writeFeatureIdNodes = function(filter, n
     for (var i=0, ii=filter.fids.length; i<ii; ++i) {
         this.writeNode("FeatureId", filter.fids[i], node);
     }
-}
+};
 OpenLayers.Util.extend(OpenLayers.Format.WFST.v1_1_0.prototype.writers.ogc, {
     "Filter": function(filter) {
         var node = this.createElementNSPlus("ogc:Filter");
