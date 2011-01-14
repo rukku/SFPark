@@ -154,3 +154,64 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
     }
 
 });
+
+// TODO: remove when this is addressed http://trac.osgeo.org/openlayers/ticket/3012
+OpenLayers.Filter.FeatureId.prototype.type = "FID";
+OpenLayers.Format.WFST.v1_1_0.prototype.writeFeatureIdNodes = function(filter, node) {
+    for (var i=0, ii=filter.fids.length; i<ii; ++i) {
+        this.writeNode("FeatureId", filter.fids[i], node);
+    }
+}
+OpenLayers.Util.extend(OpenLayers.Format.WFST.v1_1_0.prototype.writers.ogc, {
+    "Filter": function(filter) {
+        var node = this.createElementNSPlus("ogc:Filter");
+        if (filter.type === "FID") {
+            this.writeFeatureIdNodes(filter, node);
+        } else {
+            this.writeNode(this.getFilterType(filter), filter, node);
+        }
+        return node;
+    },
+    "And": function(filter) {
+        var node = this.createElementNSPlus("ogc:And");
+        var childFilter;
+        for (var i=0, ii=filter.filters.length; i<ii; ++i) {
+            childFilter = filter.filters[i];
+            if (childFilter.type === "FID") {
+                this.writeFeatureIdNodes(childFilter, node);
+            } else {
+                this.writeNode(
+                    this.getFilterType(childFilter), childFilter, node
+                );
+            }
+        }
+        return node;
+    },
+    "Or": function(filter) {
+        var node = this.createElementNSPlus("ogc:Or");
+        var childFilter;
+        for (var i=0, ii=filter.filters.length; i<ii; ++i) {
+            childFilter = filter.filters[i];
+            if (childFilter.type === "FID") {
+                this.writeFeatureIdNodes(childFilter, node);
+            } else {
+                this.writeNode(
+                    this.getFilterType(childFilter), childFilter, node
+                );
+            }
+        }
+        return node;
+    },
+    "Not": function(filter) {
+        var node = this.createElementNSPlus("ogc:Not");
+        var childFilter = filter.filters[0];
+        if (childFilter.type === "FID") {
+            this.writeFeatureIdNodes(childFilter, node);
+        } else {
+            this.writeNode(
+                this.getFilterType(childFilter), childFilter, node
+            );
+        }
+        return node;
+    }    
+});
