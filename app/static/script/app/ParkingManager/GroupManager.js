@@ -299,6 +299,18 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             var filter = new OpenLayers.Filter.FeatureId({fids: spaces});
             this.target.tools[this.featureManager].loadFeatures(filter, function(features) {
                 this.onFeatureLoad(features, record);
+                var bounds, geometry;
+                for (var i=0, ii=features.length; i<ii; ++i) {
+                    geometry = features[i].geometry;
+                    if (!bounds) {
+                        bounds = geometry.getBounds();
+                    } else {
+                        bounds.extend(geometry);
+                    }
+                }
+                if (bounds) {
+                    this.target.mapPanel.map.zoomToExtent(bounds);
+                }
             }, this);
         }
     },
