@@ -67,7 +67,23 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             layer: {
                 source: "local",
                 name: "sfpark:spaces"
-            }
+            },
+            fields: [
+                "status", "postid", "spaceid", "msid", "msspcnum", "cap color", 
+                "streetname", "sensor", "sensorid", "sfparkarea", "onoffstr", 
+                "cnn", "olstreetid", "blocfaceid", "jurisdict", "pmd", "pmd_name", 
+                "enforbeat", "subroute", "olratearea", "numeter", "olmetertyp", 
+                "numetertyp", "oltimelimt", "opsch1fm", "opsch1to", "opsch1day", 
+                "opsch1tl", "opsch1ppy", "opsch2fm", "opsch2to", "opsch2day", 
+                "opsch2tl", "opsch2ppy", "tow1fm", "tow1to", "tow1days", "tow2fm", 
+                "tow2to", "tow2days", "altsch1clr", "altsch1des", "altsch1fm", 
+                "altsch1to", "altsch1day", "altsch1tl", "altsch2clr", "altsch2des", 
+                "altsch2fm", "altsch2to", "altsch2day", "altsch2tl", "altsch3clr", 
+                "altsch3des", "altsch3fm", "altsch3to", "altsch3day", "altsch3tl", 
+                "altsch4clr", "altsch4des", "altsch4fm", "altsch4to", "altsch4day", 
+                "altsch4tl", "altsch5clr", "altsch5des", "altsch5fm", "altsch5to", 
+                "altsch5day", "altsch5tl"
+            ]
         }, {
             ptype: "gxp_googlegeocoder",
             outputTarget: "paneltbar",

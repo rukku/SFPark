@@ -23,12 +23,30 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
      *  Title for street view tab (i18n).
      */
     streetViewTitle: "Street View",
+
+    /** api: config[nameColumnHeader]
+     *  ``String``
+     *  Header for the name column in details grid (i18n).
+     */
+    nameColumnHeader: "Name",
+
+    /** api: config[valueColumnHeader]
+     *  ``String``
+     *  Header for the value column in details grid (i18n).
+     */
+    valueColumnHeader: "Value",
      
     /** api: config[detailsTitle]
      *  ``String``
      *  Title for details tab (i18n).
      */
     detailsTitle: "Details",
+
+    /** api: config[fields]
+     *  ``Array``
+     *  List of field config objects corresponding to feature attributes.  If
+     *  not provided, fields will be derived from attributes.
+     */
     
     /** api: method[addActions]
      */
@@ -88,9 +106,17 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                         title: this.detailsTitle,
                         autoScroll: true,
                         items: [{
-                            xtype: "propertygrid",
+                            xtype: "grid",
                             autoHeight: true,
-                            source: feature.attributes
+                            store: this.getAttributeStore(feature),
+                            enableHdMenu: false,
+                            columns: [
+                                {header: this.nameColumnHeader, dataIndex: this.nameColumnHeader, sortable: false, width: 50},
+                                {header: this.valueColumnHeader, dataIndex: this.valueColumnHeader, sortable: false}
+                            ],
+                            viewConfig: {
+                                forceFit: true
+                            }
                         }]
                     }, {
                         xtype: "gx_googlestreetviewpanel",
@@ -101,6 +127,35 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
             });
             this.popup.show();
         }
+    },
+    
+    /** private: method[getAttributeStore]
+     *  :arg feature:
+     *
+     *  Return a store with records corresponding to attribute names and 
+     *  values.  Fields will be derived from the ``fields`` config property
+     *  if given.  Only supporting field names now.  TODO: support field config.
+     */
+    getAttributeStore: function(feature) {
+        var fields = this.fields;
+        if (!fields) {
+            fields = [];
+            for (var name in feature.attributes) {
+                fields.push(name);
+            }
+        }
+        var len = fields.length;
+        var data = new Array(len);
+        for (var i=0; i<len; ++i) {
+            name = fields[i];
+            data[i] = [name, feature.attributes[name]];
+        }
+        
+        return new Ext.data.ArrayStore({
+            autoDestroy: true,
+            fields: [this.nameColumnHeader, this.valueColumnHeader],
+            data: data
+        });
     }
     
 });
