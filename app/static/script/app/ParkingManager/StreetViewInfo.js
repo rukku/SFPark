@@ -75,7 +75,7 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
             })
         });
         
-        this.target.getLayerRecord(this.layer, function(record) {
+        this.target.createLayerRecord(this.layer, function(record) {
             action.control.layers = [record.getLayer()];
         });
 
