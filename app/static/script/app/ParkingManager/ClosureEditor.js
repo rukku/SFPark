@@ -50,6 +50,9 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 "vertexmodified": function(evt) {
                     this.geomModified[evt.feature.id] = true;
                 },
+                "vertexremoved": function(evt) {
+                    this.geomModified[evt.feature.id] = true;
+                },
                 scope: this
             });
         }, this);
