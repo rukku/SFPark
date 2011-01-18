@@ -95,29 +95,26 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
             this.popup = new GeoExt.Popup({
                 location: event.xy,
                 map: this.target.mapPanel,
+                maximizable: true,
+                width: 310,
+                height: 325,
+                layout: "fit",
                 items: [{
                     xtype: "tabpanel",
                     border: false,
                     activeTab: 0,
-                    width: 300,
-                    height: 300,
                     items: [{
-                        xtype: "container",
+                        xtype: "grid",
                         title: this.detailsTitle,
-                        autoScroll: true,
-                        items: [{
-                            xtype: "grid",
-                            autoHeight: true,
-                            store: this.getAttributeStore(feature),
-                            enableHdMenu: false,
-                            columns: [
-                                {header: this.nameColumnHeader, dataIndex: this.nameColumnHeader, sortable: false, width: 50},
-                                {header: this.valueColumnHeader, dataIndex: this.valueColumnHeader, sortable: false}
-                            ],
-                            viewConfig: {
-                                forceFit: true
-                            }
-                        }]
+                        store: this.getAttributeStore(feature),
+                        enableHdMenu: false,
+                        columns: [
+                            {header: this.nameColumnHeader, dataIndex: this.nameColumnHeader, sortable: false, width: 50},
+                            {header: this.valueColumnHeader, dataIndex: this.valueColumnHeader, sortable: false}
+                        ],
+                        viewConfig: {
+                            forceFit: true
+                        }
                     }, {
                         xtype: "gx_googlestreetviewpanel",
                         title: this.streetViewTitle,
