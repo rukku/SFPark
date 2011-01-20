@@ -32,8 +32,10 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         
         closureManager.on("layerchange", function() {
             target.tools[this.spaceManager].clearFeatures();
+            var removing = false;
             closureManager.featureLayer.events.on({
                 "featureselected": function(evt) {
+                    removing = false;
                     evt.feature.state ?
                         this.setSpaces(evt.feature) :
                         this.selectSpaces(evt.feature);
@@ -42,7 +44,10 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     target.tools[this.spaceManager].featureStore.removeAll();
                 },
                 "featureremoved": function(evt) {
-                    target.tools[this.spaceManager].featureStore.removeAll();
+                    if (removing === false) {
+                        removing = true;
+                        target.tools[this.spaceManager].featureStore.removeAll();
+                    }
                 },
                 "vertexmodified": function(evt) {
                     this.geomModified[evt.feature.id] = true;
@@ -51,8 +56,10 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     this.geomModified[evt.feature.id] = true;
                 },
                 scope: this
-            });
-            closureManager.featureStore.on({
+            })
+        }, this, {single: true});
+        closureManager.on("layerchange", function() {
+            closureManager.featureStore && closureManager.featureStore.on({
                 "update": function(store, record, operation) {
                     var feature = record.getFeature();
                     if (operation === Ext.data.Record.COMMIT) {
