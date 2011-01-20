@@ -41,11 +41,8 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 "featureunselected": function(evt) {
                     target.tools[this.spaceManager].featureStore.removeAll();
                 },
-                "featuremodified": function(evt) {
-                    if (!evt.feature.attributes.spaces || this.geomModified[evt.feature.id]) {
-                        delete this.geomModified[evt.feature.id];
-                        this.setSpaces(evt.feature);
-                    }
+                "featureremoved": function(evt) {
+                    target.tools[this.spaceManager].featureStore.removeAll();
                 },
                 "vertexmodified": function(evt) {
                     this.geomModified[evt.feature.id] = true;
@@ -55,6 +52,19 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 },
                 scope: this
             });
+            closureManager.featureStore.on({
+                "update": function(store, record, operation) {
+                    var feature = record.getFeature();
+                    if (operation === Ext.data.Record.COMMIT) {
+                        this.geomModified[feature.id] = true;
+                    }
+                    if (!feature.attributes.spaces || this.geomModified[feature.id]) {
+                        delete this.geomModified[feature.id];
+                        this.setSpaces(feature);
+                    }
+                },
+                scope: this
+            })
         }, this);
 
         // use the FeatureGrid plugin for this tool's feature grid
