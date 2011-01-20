@@ -57,7 +57,10 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
         }];
 
         config.tools = [{
-            ptype: "gx_zoomtoextent",
+            ptype: "gxp_zoomtoextent",
+            actionTarget: "paneltbar"
+        }, {
+            ptype: "gxp_navigationhistory",
             actionTarget: "paneltbar"
         }, {
             ptype: "app_streetviewinfo",
