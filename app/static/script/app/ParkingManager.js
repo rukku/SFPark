@@ -1,4 +1,6 @@
-
+//TODO configure this in index.html instead of making this global change once
+// https://github.com/opengeo/gxp/issues#issue/14 is resolved.
+OpenLayers.Layer.Google.v3.animationEnabled = false;
 
 var ParkingManager = Ext.extend(gxp.Viewer, {
 
