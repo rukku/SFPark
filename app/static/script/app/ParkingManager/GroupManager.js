@@ -186,11 +186,11 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             map: this.target.mapPanel.map,
             control: new (OpenLayers.Class(OpenLayers.Control, {
                 initialize: function() {
-                    this.handler = new OpenLayers.Handler.Box(this, {
+                    this.handler = new OpenLayers.Handler.Polygon(this, {
                         done: function(result) {
-                            tool.handleBoxResult(result, this.handler.dragHandler.evt);
+                            tool.handleLassoResult(result, this.handler.evt);
                         }
-                    });
+                    }, {freehand: true, freehandToggle: false});
                     OpenLayers.Control.prototype.initialize.apply(this, arguments);
                 }
             }))()
@@ -349,28 +349,28 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         return ParkingManager.GroupManager.superclass.addOutput.call(this, this.container);
     },
     
-    handleBoxResult: function(result, event) {
-        var minX, minY, maxX, maxY;
-        var buffer = this.clickBuffer;
-        if (result instanceof OpenLayers.Pixel) {
-            minX = result.x - buffer;
-            minY = result.y - buffer;
-            maxX = result.x + buffer;
-            maxY = result.y + buffer;
+    handleLassoResult: function(result, event) {
+        var filter;
+        if (result.components[0].components.length == 2) {
+            var minX, minY, maxX, maxY;
+            var buffer = this.clickBuffer;
+            minX = event.xy.x - buffer;
+            minY = event.xy.y - buffer;
+            maxX = event.xy.x + buffer;
+            maxY = event.xy.y + buffer;
+            var map = this.target.mapPanel.map;
+            var tl = map.getLonLatFromPixel({x: minX, y: minY});
+            var br = map.getLonLatFromPixel({x: maxX, y: maxY});
+            filter = new OpenLayers.Filter.Spatial({
+                type: OpenLayers.Filter.Spatial.BBOX,
+                value: new OpenLayers.Bounds(tl.lon, br.lat, br.lon, tl.lat)
+            });
         } else {
-            minX = result.left;
-            minY = result.top;
-            maxX = result.right;
-            maxY = result.bottom;
+            filter = new OpenLayers.Filter.Spatial({
+                type: OpenLayers.Filter.Spatial.WITHIN,
+                value: result
+            });
         }
-        var map = this.target.mapPanel.map;
-        var tl = map.getLonLatFromPixel({x: minX, y: minY});
-        var br = map.getLonLatFromPixel({x: maxX, y: maxY});
-        var filter = new OpenLayers.Filter.Spatial({
-            type: OpenLayers.Filter.Spatial.BBOX,
-            value: new OpenLayers.Bounds(tl.lon, br.lat, br.lon, tl.lat),
-            projection: map.getProjectionObject()
-        });
         var spaces = (this.selectedGroup.get("spaces") || "").split(",");
         if (spaces.length && spaces[0]) {
             if (event[this.removeModifierKey]) {
