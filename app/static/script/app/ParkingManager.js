@@ -51,7 +51,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "group-editor",
                     title: "Group Management",
-                    layout: "fit"
+                    layout: "fit",
+                    tbar: []
                 }, {
                     id: "closure-editor",
                     title: "Closure Management",
@@ -145,11 +146,12 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             autoLoadFeatures: true,
             actionTarget: "space-editor.tbar",
             toggleGroup: "main",
-            createFeatureActionText: "new space",
-            editFeatureActionText: "modify space"
+            createFeatureActionText: "New space",
+            editFeatureActionText: "Modify space"
         }, {
             ptype: "app_groupmanager",
             outputTarget: "group-editor",
+            actionTarget: "group-editor.tbar",
             toggleGroup: "main",
             featureManager: "space-manager",
             layer: {
@@ -163,6 +165,11 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 fillColor: "#ff0000",
                 fillOpacity: 0.2
             }
+        }, {
+            ptype: "gxp_zoomtodataextent",
+            featureManager: "space-manager",
+            actionTarget: "group-editor.tbar",
+            tooltip: "Zoom to selected group"
         }, {
             ptype: "gx_featuremanager",
             id: "closure-manager",
@@ -182,8 +189,13 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             snappingAgent: "curb-snapping",
             actionTarget: "closure-editor.tbar",
             toggleGroup: "main",
-            createFeatureActionText: "new closure",
-            editFeatureActionText: "modify closure"
+            createFeatureActionText: "New closure",
+            editFeatureActionText: "Modify closure"
+        }, {
+            ptype: "gxp_zoomtoselectedfeatures",
+            featureManager: "closure-manager",
+            actionTarget: "closure-editor.tbar",
+            tooltip: "Zoom to selected closure"
         }, {
             ptype: "app_closureeditor",
             spaceManager: "space-manager",

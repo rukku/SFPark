@@ -91,6 +91,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     /** private: property[selectedGroup]
      */
     
+    /** private: property[modify]
+     */
+    
     /** api: method[init]
      *  :arg target: ``gxp.Viewer``
      *  Initialize the plugin.
@@ -100,6 +103,72 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         
         this.initGroupFeatureManager();
         this.initContainer();
+    },
+    
+    addActions: function(config) {
+        this.addOutput();
+        
+        var tool = this;
+        var actions = ParkingManager.GroupManager.superclass.addActions.call(this, [{
+            tooltip: this.addActionTip,
+            text: this.addActionText,
+            iconCls: "app-icon-addgroup",
+            handler: function() {
+                // create a new feature
+                var feature = new OpenLayers.Feature.Vector();
+                feature.state = OpenLayers.State.INSERT;
+                var manager = this.groupFeatureManager;
+                manager.featureLayer.addFeatures([feature]);
+                this.container.disable();
+                var store = manager.featureStore;
+                
+                // save the new feature
+                store.save();
+                store.on({
+                    write: {
+                        fn: function() {
+                            this.container.enable();
+                            var lastIndex = this.container.grid.getStore().getCount() - 1;
+                            this.container.grid.getSelectionModel().selectRow(lastIndex, false);
+                            this.container.grid.startEditing(lastIndex, 0);
+                            this.modify.control.activate();
+                        },
+                        single: true
+                    },
+                    scope: this
+                });
+                
+            },
+            scope: this
+        }, new GeoExt.Action({
+            tooltip: this.modifyActionTip,
+            disabled: true,
+            text: this.modifyActionText,
+            iconCls: "app-icon-boxselect",
+            toggleGroup: this.toggleGroup,
+            enableToggle: true,
+            allowDepress: true,
+            map: this.target.mapPanel.map,
+            control: new (OpenLayers.Class(OpenLayers.Control, {
+                initialize: function() {
+                    this.handler = new OpenLayers.Handler.Polygon(this, {
+                        done: function(result) {
+                            tool.handleLassoResult(result, this.handler.evt);
+                        }
+                    }, {
+                        freehand: true,
+                        freehandToggle: false,
+                        layerOptions: {
+                            styleMap: new OpenLayers.StyleMap(tool.symbolizer)
+                        },
+                    });
+                    OpenLayers.Control.prototype.initialize.apply(this, arguments);
+                }
+            }))()
+        })]);
+        
+        this.modify = actions[1];
+        return actions;
     },
     
     /** private: method[initGroupFeatureManager]
@@ -168,70 +237,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  components to the container.
      */
     addComponents: function() {
-
-        var tool = this;
+        var modify = this.modify;
         
-        var add = new Ext.Action({
-            tooltip: this.addActionTip,
-            text: this.addActionText,
-            iconCls: "app-icon-addgroup",
-            handler: function() {
-                // create a new feature
-                var feature = new OpenLayers.Feature.Vector();
-                feature.state = OpenLayers.State.INSERT;
-                var manager = this.groupFeatureManager;
-                manager.featureLayer.addFeatures([feature]);
-                this.container.disable();
-                var store = manager.featureStore;
-                
-                // save the new feature
-                store.save();
-                store.on({
-                    write: {
-                        fn: function() {
-                            this.container.enable();
-                            var lastIndex = grid.getStore().getCount() - 1;
-                            grid.getSelectionModel().selectRow(lastIndex, false);
-                            grid.startEditing(lastIndex, 0);
-                            modify.control.activate();
-                        },
-                        single: true
-                    },
-                    scope: this
-                });
-                
-            },
-            scope: this
-        });
-
-        var modify = new GeoExt.Action({
-            tooltip: this.modifyActionTip,
-            disabled: true,
-            text: this.modifyActionText,
-            iconCls: "app-icon-boxselect",
-            toggleGroup: this.toggleGroup,
-            enableToggle: true,
-            allowDepress: true,
-            map: this.target.mapPanel.map,
-            control: new (OpenLayers.Class(OpenLayers.Control, {
-                initialize: function(config) {
-                    this.handler = new OpenLayers.Handler.Polygon(this, {
-                        done: function(result) {
-                            tool.handleLassoResult(result, this.handler.evt);
-                        }
-                    }, {
-                        freehand: true,
-                        freehandToggle: false,
-                        layerOptions: {
-                            styleMap: new OpenLayers.StyleMap(config.symbolizer)
-                        },
-                    });
-                    OpenLayers.Control.prototype.initialize.apply(this, arguments);
-                }
-            }))({symbolizer: this.symbolizer})
-        });
-
         var grid = new Ext.grid.EditorGridPanel({
+            ref: "grid",
             border: false,
             store: this.groupFeatureManager.featureStore,
             selModel: new Ext.grid.RowSelectionModel({
@@ -307,7 +316,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 }]
             }],
             autoExpandColumn: "title",
-            bbar: ["->", add, modify],
             listeners: {
                 afteredit: function(event) {
                     if (event.value !== event.original) {
@@ -366,18 +374,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             var filter = new OpenLayers.Filter.FeatureId({fids: spaces});
             this.target.tools[this.featureManager].loadFeatures(filter, function(features) {
                 this.onFeatureLoad(features, record);
-                var bounds, geometry;
-                for (var i=0, ii=features.length; i<ii; ++i) {
-                    geometry = features[i].geometry;
-                    if (!bounds) {
-                        bounds = geometry.getBounds();
-                    } else {
-                        bounds.extend(geometry);
-                    }
-                }
-                if (bounds) {
-                    this.target.mapPanel.map.zoomToExtent(bounds);
-                }
             }, this);
         }
     },
