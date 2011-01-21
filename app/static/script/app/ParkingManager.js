@@ -30,6 +30,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 layout: "accordion",
                 width: 210,
                 split: true,
+                collapsible: true,
+                collapseMode: "mini",
+                header: false,
                 defaults: {
                     border: false
                 },
