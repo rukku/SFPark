@@ -37,6 +37,18 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     removeActionTip: "Remove group",
 
+    /** api: config[removeTitle]
+     *  ``String``
+     *  Text for delete confirmation window title (i18n).
+     */
+    removeTitle: "Remove Group",
+
+    /** api: config[removeMessage]
+     *  ``String``
+     *  Text for delete confirmation window text (i18n).
+     */
+    removeMessage: "Are you sure you want to remove this group?",
+
     /** api: config[searchLabel]
      *  ``String``
      *  Label for search input (i18n).
@@ -270,17 +282,21 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     iconCls: "app-icon-removegroup",
                     tooltip: this.removeActionTip,
                     handler: function(grid, rowIndex) {
-                        if (grid.getSelectionModel().isSelected(rowIndex)) {
-                            modify.control.deactivate();
-                            modify.disable();
-                        }
-                        this.target.tools[this.featureManager].clearFeatures();
-                        var store = grid.store;
-                        store._removing = true; // TODO: remove after http://trac.geoext.org/ticket/141
-                        store.getAt(rowIndex).getFeature().state = OpenLayers.State.DELETE; // TODO: remove after http://trac.geoext.org/ticket/141
-                        store.removeAt(rowIndex);
-                        delete store._removing; // TODO: remove after http://trac.geoext.org/ticket/141
-                        store.save();
+                        Ext.Msg.confirm(this.removeTitle, this.removeMessage, function(btn) {
+                            if (btn == "yes") {
+                                if (grid.getSelectionModel().isSelected(rowIndex)) {
+                                    modify.control.deactivate();
+                                    modify.disable();
+                                }
+                                this.target.tools[this.featureManager].clearFeatures();
+                                var store = grid.store;
+                                store._removing = true; // TODO: remove after http://trac.geoext.org/ticket/141
+                                store.getAt(rowIndex).getFeature().state = OpenLayers.State.DELETE; // TODO: remove after http://trac.geoext.org/ticket/141
+                                store.removeAt(rowIndex);
+                                delete store._removing; // TODO: remove after http://trac.geoext.org/ticket/141
+                                store.save();
+                            }
+                        }, this);
                     },
                     scope: this
                 }]
