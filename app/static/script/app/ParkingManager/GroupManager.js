@@ -64,6 +64,18 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     maxFeatures: 100,
     
+    /** api: config[layer]
+     *  ``Object`` with source and name properties. The layer referenced here
+     *  will be set as soon as it is added to the target's map. When this
+     *  option is configured, ``autoSetLayer`` will be set to false.
+     */
+
+     /** api: config[symbolizer]
+      *  ``Object`` An object with "Point", "Line" and "Polygon" properties,
+      *  each with a valid symbolizer object for OpenLayers. Will be used to
+      *  draw the selection lasso.
+      */
+
     /** private: property[selectedGroup]
      */
     
@@ -121,7 +133,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                             spacesManager.showLayer(this.id);
                         },
                         collapse: function() {
-                            this.groupFeatureManager.activate();
+                            this.groupFeatureManager.deactivate();
                             var spacesManager = this.target.tools[this.featureManager];
                             spacesManager.clearFeatures();
                             spacesManager.hideLayer(this.id);
@@ -185,15 +197,21 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             allowDepress: true,
             map: this.target.mapPanel.map,
             control: new (OpenLayers.Class(OpenLayers.Control, {
-                initialize: function() {
+                initialize: function(config) {
                     this.handler = new OpenLayers.Handler.Polygon(this, {
                         done: function(result) {
                             tool.handleLassoResult(result, this.handler.evt);
                         }
-                    }, {freehand: true, freehandToggle: false});
+                    }, {
+                        freehand: true,
+                        freehandToggle: false,
+                        layerOptions: {
+                            styleMap: new OpenLayers.StyleMap(config.symbolizer)
+                        },
+                    });
                     OpenLayers.Control.prototype.initialize.apply(this, arguments);
                 }
-            }))()
+            }))({symbolizer: this.symbolizer})
         });
 
         var grid = new Ext.grid.EditorGridPanel({

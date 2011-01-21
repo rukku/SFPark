@@ -121,7 +121,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             },
             symbolizer: {
                 pointRadius: 6,
-                fillColor: "red",
+                fillColor: "#ff0000",
                 strokeWidth: 2,
                 strokeColor: "#ffcc33"
             }
@@ -152,6 +152,13 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             layer: {
                 source: "local",
                 name: "sfpark:groups"
+            },
+            symbolizer: {
+                strokeColor: "#000000",
+                strokeWidth: 1,
+                strokeDashstyle: "dot",
+                fillColor: "#ff0000",
+                fillOpacity: 0.2
             }
         }, {
             ptype: "gx_featuremanager",
