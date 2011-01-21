@@ -188,7 +188,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                         this.addComponents();
                     } else {
                         // no featureStore, remove components
-                        this.container.removeAll();
+                        this.container.gridContainer.removeAll();
                     }
                 },
                 scope: this
@@ -203,12 +203,44 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     initContainer: function() {
         this.container = new Ext.Container({
-            layout: "vbox",
-            layoutConfig: {
-                align: "stretch",
-                pack: "start"
-            },
-            items: [],
+            layout: "border",
+            items: [{
+                layout: "form",
+                region: "north",
+                border: false,
+                height: 55,
+                labelAlign: "top",
+                bodyStyle: {
+                    padding: "5px"
+                },
+                items: [{
+                    xtype: "textfield",
+                    name: "keywords",
+                    fieldLabel: this.searchLabel,
+                    anchor: "100%",
+                    validationDelay: 500,
+                    listeners: {
+                        valid: function(field) {
+                            var filter = new OpenLayers.Filter.Comparison({
+                                type: OpenLayers.Filter.Comparison.LIKE,
+                                property: "title",
+                                value: "*" + field.getValue() + "*"
+                            });
+                            console.log("querying");
+                            this.groupFeatureManager.loadFeatures(filter);
+                        },
+                        focus: function(field) {
+                            field.reset();
+                        },
+                        scope: this
+                    }
+                }]
+            }, {
+                xtype: "container",
+                layout: "fit",
+                region: "center",
+                ref: "gridContainer"
+            }],
             listeners: {
                 added: function(panel, container) {
                     container.on({
@@ -240,7 +272,8 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         var modify = this.modify;
         
         var grid = new Ext.grid.EditorGridPanel({
-            ref: "grid",
+            ref: "../grid",
+            autoScroll: true,
             border: false,
             store: this.groupFeatureManager.featureStore,
             selModel: new Ext.grid.RowSelectionModel({
@@ -260,7 +293,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     scope: this
                 }
             }),
-            autoHeight: true,
             columns: [{
                 id: "title",
                 header: "Title",
@@ -331,39 +363,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             }
         });
         
-        this.container.add([{
-            layout: "form",
-            border: false,
-            labelAlign: "top",
-            style: {
-                padding: "10px"
-            },
-            items: [{
-                xtype: "textfield",
-                name: "keywords",
-                fieldLabel: this.searchLabel,
-                anchor: "95%",
-                validationDelay: 500,
-                listeners: {
-                    valid: function(field) {
-                        var filter = new OpenLayers.Filter.Comparison({
-                            type: OpenLayers.Filter.Comparison.LIKE,
-                            property: "title",
-                            value: "*" + field.getValue() + "*"
-                        });
-                        console.log("querying");
-                        this.groupFeatureManager.loadFeatures(filter);
-                    },
-                    focus: function(field) {
-                        field.reset();
-                    },
-                    scope: this
-                }
-            }]
-        }, grid]);
+        this.container.gridContainer.add([grid]);
         
-        if (this.container.rendered) {
-            this.container.doLayout();
+        if (this.container.gridContainer.rendered) {
+            this.container.gridContainer.doLayout();
         }
 
     },
