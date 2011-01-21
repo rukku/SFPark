@@ -113,9 +113,14 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             autoActivate: false,
             layer: this.layer,
             listeners: {
-                layerchange: function() {
-                    // featureStore is set
-                    this.addComponents();
+                layerchange: function(tool, store) {
+                    if (store) {
+                        // featureStore is set
+                        this.addComponents();
+                    } else {
+                        // no featureStore, remove components
+                        this.container.removeAll();
+                    }
                 },
                 scope: this
             }
