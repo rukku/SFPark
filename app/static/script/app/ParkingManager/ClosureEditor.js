@@ -78,6 +78,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         new gxp.plugins.FeatureGrid({
             featureManager: this.closureManager,
             outputTarget: this.featureGridTarget,
+            outputConfig: {border: false},
             alwaysDisplayOnMap: true
         }).init(target);
     },
@@ -89,6 +90,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             items: [{
                 xtype: "form",
                 region: "north",
+                border: false,
                 height: 163,
                 labelWidth: 45,
                 bodyStyle: "padding: 5px",
