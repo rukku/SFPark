@@ -4,7 +4,7 @@
 
 ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     
-    /** api: ptype = gx_wmsgetfeatureinfo */
+    /** api: ptype = gxp_wmsgetfeatureinfo */
     ptype: "app_groupmanager",
 
     /** api: config[addActionTip]

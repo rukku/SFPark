@@ -4,7 +4,7 @@ OpenLayers.Layer.Google.v3.animationEnabled = false;
 
 var ParkingManager = Ext.extend(gxp.Viewer, {
 
-    defaultSourceType: "gx_wmssource",
+    defaultSourceType: "gxp_wmssource",
 
     constructor: function(config) {
 
@@ -101,7 +101,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 listEmptyText: "- no matches -"
             }
         }, {
-            ptype: "gx_layertree",
+            ptype: "gxp_layertree",
             outputConfig: {
                 id: "layertree",
                 tbar: []
@@ -111,10 +111,10 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "gxp_addlayers",
             actionTarget: "layertree.tbar"
         }, {
-            ptype: "gx_removelayer",
+            ptype: "gxp_removelayer",
             actionTarget: ["layertree.tbar", "layertree.contextMenu"]
         }, {
-            ptype: "gx_featuremanager",
+            ptype: "gxp_featuremanager",
             id: "space-manager",
             paging: false,
             autoSetLayer: false,
@@ -130,7 +130,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 strokeColor: "#ffcc33"
             }
         }, {
-            ptype: "gx_snappingagent",
+            ptype: "gxp_snappingagent",
             id: "curb-snapping",
             targets: [{
                 source: "local",
@@ -140,7 +140,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 vertex: false
             }]
         }, {
-            ptype: "gx_featureeditor",
+            ptype: "gxp_featureeditor",
             featureManager: "space-manager",
             snappingAgent: "curb-snapping",
             autoLoadFeatures: true,
@@ -171,7 +171,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             actionTarget: "group-editor.tbar",
             tooltip: "Zoom to selected group"
         }, {
-            ptype: "gx_featuremanager",
+            ptype: "gxp_featuremanager",
             id: "closure-manager",
             autoActivate: false,
             autoLoadFeatures: true,
@@ -183,7 +183,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 name: "sfpark:closures"
             }
         }, {
-            ptype: "gx_featureeditor",
+            ptype: "gxp_featureeditor",
             excludeFields: ["spaces"],
             featureManager: "closure-manager",
             snappingAgent: "curb-snapping",
