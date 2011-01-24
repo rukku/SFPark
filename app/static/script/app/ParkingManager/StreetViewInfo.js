@@ -116,7 +116,7 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                             forceFit: true
                         }
                     }, {
-                        xtype: "gx_googlestreetviewpanel",
+                        xtype: "gxp_googlestreetviewpanel",
                         title: this.streetViewTitle,
                         zoom: 1
                     }]
