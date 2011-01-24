@@ -58,7 +58,7 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
         
         var action = new GeoExt.Action({
             tooltip: this.infoActionTip,
-            iconCls: "gx-icon-getfeatureinfo",
+            iconCls: "gxp-icon-getfeatureinfo",
             toggleGroup: this.toggleGroup,
             enableToggle: true,
             allowDepress: true,
