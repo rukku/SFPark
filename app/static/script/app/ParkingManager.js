@@ -59,6 +59,34 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                     layout: "fit",
                     tbar: []
                 }]
+            }, {
+                region: "south",
+                id: "grid",
+                layout: "fit",
+                height: 200,
+                border: false,
+                split: true,
+                collapsible: true,
+                collapsed: true,
+                collapseMode: "mini",
+                header: false,
+                //TODO move this to its own component - no js code in this
+                // config object please
+                listeners: {
+                    beforeexpand: function() {
+                        var featureStore = this.tools["generic-featuremanager"].featureStore;
+                        if (!(featureStore && featureStore.getCount())) {
+                            //TODO use action's handler in gxp.plugins.Tool to
+                            // de-uglify this.
+                            featureStore && this.tools["query-form"].actions[0].items[0].fireEvent("click");
+                            return false;
+                        }
+                    },
+                    collapse: function() {
+                        this.tools["generic-featuremanager"].clearFeatures();
+                    },
+                    scope: this
+                }
             }, "map"]
         }];
 
@@ -203,6 +231,30 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             spacesManager: "space-manager",
             closureManager: "closure-manager",
             outputTarget: "closure-editor"
+        }, {
+            ptype: "gxp_featuremanager",
+            id: "generic-featuremanager",
+            maxFeatures: 50
+        }, {
+            ptype: "gxp_featuregrid",
+            id: "featuregrid",
+            featureManager: "generic-featuremanager",
+            outputTarget: "grid",
+            alwaysDisplayOnMap: true,
+            autoExpand: true,
+            autoCollapse: true
+        }, {
+            ptype: "gxp_queryform",
+            id: "query-form",
+            featureManager: "generic-featuremanager",
+            autoHide: true,
+            actionTarget: ["layertree.tbar", "layertree.contextMenu"],
+            outputConfig: {
+                width: 350,
+                title: "Query Layer",
+                modal: true,
+                closeAction: "hide"
+            }
         }/*, {
             ptype: "app_addremovespaces",
             spaceManager: "space-manager",
