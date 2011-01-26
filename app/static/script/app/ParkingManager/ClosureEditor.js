@@ -7,7 +7,13 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = app_closureeditor */
     ptype: "app_closureeditor",
     
-    /** api: config[spaceManager]
+    /** api: config[safePanels]
+     *  ``Array`` List of ids of panels on the same accordion that are
+     *  safe to switch to while this tool is active. When switching to any
+     *  other panel, this tool will be activated.
+     */
+    
+    /** api: config[spacesManager]
      *  ``String`` FeatureManager for the Spaces layer
      */
     
@@ -19,6 +25,9 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
      *  ``Object`` keys are feature ids of features with modified geometries;
      *  value is true
      */
+    
+    /** private override */
+    autoActivate: false,
     
     /** api: method[init]
      */
@@ -40,12 +49,12 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                         this.selectSpaces(evt.feature);
                 },
                 "featureunselected": function(evt) {
-                    target.tools[this.spaceManager].featureStore.removeAll();
+                    target.tools[this.spacesManager].featureStore.removeAll();
                 },
                 "featureremoved": function(evt) {
                     if (removing === false) {
                         removing = true;
-                        target.tools[this.spaceManager].featureStore.removeAll();
+                        target.tools[this.spacesManager].featureStore.removeAll();
                     }
                 },
                 "vertexmodified": function(evt) {
@@ -170,25 +179,53 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         
         var container = Ext.getCmp(this.outputTarget) || this.target.portal[this.outputTarget];
         container.on({
-            "expand": function() {
-                this.target.tools[this.closureManager].activate();
-                var spaceManager = this.target.tools[this.spaceManager];
-                spaceManager.clearFeatures();
-                spaceManager.showLayer(this.id);
-            },
+            "expand": this.activate,
             "collapse": function() {
-                this.target.tools[this.closureManager].deactivate();
-                var spaceManager = this.target.tools[this.spaceManager];
-                spaceManager.clearFeatures();
-                spaceManager.hideLayer(this.id);
+                if (!this.safe) {
+                    this.deactivate();
+                }
             },
             scope: this
         });
+        
+        if (this.safePanels) {
+            for (var i=this.safePanels.length-1; i>=0; --i) {
+                Ext.getCmp(this.safePanels[i]).on({
+                    "beforeexpand": function() {this.safe = true;},
+                    "collapse": function(panel) {
+                        this.safe = false;
+                        var activeItem = container.ownerCt.layout.activeItem.id;
+                        if (activeItem != this.outputTarget && this.safePanels.indexOf(activeItem) == -1) {
+                            this.deactivate();
+                        }
+                    },
+                    scope: this
+                });
+            }
+        }
+    },
+    
+    activate: function() {
+        if (ParkingManager.ClosureEditor.superclass.activate.apply(this, arguments)) {
+            this.target.tools[this.closureManager].activate();
+            var spacesManager = this.target.tools[this.spacesManager];
+            spacesManager.clearFeatures();
+            spacesManager.showLayer(this.id);
+        }
+    },
+    
+    deactivate: function() {
+        if (ParkingManager.ClosureEditor.superclass.deactivate.apply(this, arguments)) {
+            this.target.tools[this.closureManager].deactivate();
+            var spacesManager = this.target.tools[this.spacesManager];
+            spacesManager.clearFeatures();
+            spacesManager.hideLayer(this.id);
+        }
     },
     
     setSpaces: function(feature) {
         var closureManager = this.target.tools[this.closureManager];
-        var spaceManager = this.target.tools[this.spaceManager];
+        var spacesManager = this.target.tools[this.spacesManager];
         var filter = new OpenLayers.Filter.Spatial({
             type: OpenLayers.Filter.Spatial.DWITHIN,
             value: feature.geometry,
@@ -196,7 +233,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         });
         var rec = closureManager.featureStore.getRecordFromFeature(feature);
         var currentFids = (rec.get("spaces") || "").split(",");
-        spaceManager.loadFeatures(filter, function(features) {
+        spacesManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
             for (var i=features.length-1; i>=0; --i) {
                 fids[i] = features[i].fid.replace("spaces.", "");
@@ -209,7 +246,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         if (feature.attributes.spaces) {
             var fids = feature.attributes.spaces.split(",");
             var filter = new OpenLayers.Filter.FeatureId({fids: fids});
-            this.target.tools[this.spaceManager].loadFeatures(filter);
+            this.target.tools[this.spacesManager].loadFeatures(filter);
         }
     }
     

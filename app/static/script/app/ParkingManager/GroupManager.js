@@ -76,6 +76,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     maxFeatures: 100,
     
+    /** api: config[safePanels]
+     *  ``Array`` List of ids of panels on the same accordion that are
+     *  safe to switch to while this tool is active. When switching to any
+     *  other panel, this tool will be activated.
+     */
+    
     /** api: config[layer]
      *  ``Object`` with source and name properties. The layer referenced here
      *  will be set as soon as it is added to the target's map. When this
@@ -93,6 +99,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     
     /** private: property[modify]
      */
+    
+    /** private override */
+    autoActivate: false,
     
     /** api: method[init]
      *  :arg target: ``gxp.Viewer``
@@ -244,26 +253,54 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             listeners: {
                 added: function(panel, container) {
                     container.on({
-                        expand: function() {
-                            this.groupFeatureManager.activate();
-                            var spacesManager = this.target.tools[this.featureManager];
-                            spacesManager.clearFeatures();
-                            spacesManager.showLayer(this.id);
-                        },
-                        collapse: function() {
-                            this.groupFeatureManager.deactivate();
-                            var spacesManager = this.target.tools[this.featureManager];
-                            spacesManager.clearFeatures();
-                            spacesManager.hideLayer(this.id);
+                        "expand": this.activate,
+                        "collapse": function() {
+                            if (!this.safe) {
+                                this.deactivate();
+                            }
                         },
                         scope: this
                     });
+
+                    if (this.safePanels) {
+                        for (var i=this.safePanels.length-1; i>=0; --i) {
+                            Ext.getCmp(this.safePanels[i]).on({
+                                "beforeexpand": function() {this.safe = true;},
+                                "collapse": function(panel) {
+                                    this.safe = false;
+                                    var activeItem = container.ownerCt.layout.activeItem.id;
+                                    if (activeItem != this.outputTarget && this.safePanels.indexOf(activeItem) == -1) {
+                                        this.deactivate();
+                                    }
+                                },
+                                scope: this
+                            });
+                        }
+                    }
                 },
                 scope: this
             }
         });
     },
     
+    activate: function() {
+        if (ParkingManager.GroupManager.superclass.activate.apply(this, arguments)) {
+            this.groupFeatureManager.activate();
+            var spacesManager = this.target.tools[this.featureManager];
+            spacesManager.clearFeatures();
+            spacesManager.showLayer(this.id);
+        }
+    },
+
+    deactivate: function() {
+        if (ParkingManager.GroupManager.superclass.deactivate.apply(this, arguments)) {
+            this.groupFeatureManager.deactivate();
+            var spacesManager = this.target.tools[this.featureManager];
+            spacesManager.clearFeatures();
+            spacesManager.hideLayer(this.id);
+        }
+    },
+
     /** private: method[addComponents]
      *  Called when the feature store is ready.  At this point, we can add 
      *  components to the container.

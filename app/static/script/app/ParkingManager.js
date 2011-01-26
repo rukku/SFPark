@@ -151,6 +151,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             editFeatureActionText: "Modify space"
         }, {
             ptype: "app_groupmanager",
+            safePanels: ["tree"],
             outputTarget: "group-editor",
             actionTarget: "group-editor.tbar",
             toggleGroup: "main",
@@ -198,7 +199,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             tooltip: "Zoom to selected closure"
         }, {
             ptype: "app_closureeditor",
-            spaceManager: "space-manager",
+            safePanels: ["tree"],
+            spacesManager: "space-manager",
             closureManager: "closure-manager",
             outputTarget: "closure-editor"
         }/*, {
