@@ -103,7 +103,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 name: "sfpark:spaces"
             },
             fields: [
-                "status", "postid", "spaceid", "msid", "msspcnum", "cap color", 
+                "status", "postid", "spaceid", "msid", "msspcnum", "capcolor", 
                 "streetname", "sensor", "sensorid", "sfparkarea", "onoffstr", 
                 "cnn", "olstreetid", "blocfaceid", "jurisdict", "pmd", "pmd_name", 
                 "enforbeat", "subroute", "olratearea", "numeter", "olmetertyp", 
