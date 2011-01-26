@@ -237,9 +237,15 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             id: "featuregrid",
             featureManager: "generic-featuremanager",
             outputTarget: "grid",
+            outputConfig: {id: "featuregrid-output"},
             alwaysDisplayOnMap: true,
             autoExpand: true,
             autoCollapse: true
+        }, {
+            ptype: "gxp_zoomtoselectedfeatures",
+            featureManager: "generic-featuremanager",
+            actionTarget: "featuregrid-output.bbar",
+            buttonText: "Zoom to selection"
         }, {
             ptype: "gxp_queryform",
             id: "query-form",
