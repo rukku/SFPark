@@ -31,7 +31,6 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         this.featureGridTarget = Ext.id();
         
         closureManager.on("layerchange", function() {
-            target.tools[this.spaceManager].clearFeatures();
             var removing = false;
             closureManager.featureLayer.events.on({
                 "featureselected": function(evt) {
@@ -172,12 +171,16 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         var container = Ext.getCmp(this.outputTarget) || this.target.portal[this.outputTarget];
         container.on({
             "expand": function() {
-                this.target.tools[this.spaceManager].showLayer(this.id);
                 this.target.tools[this.closureManager].activate();
+                var spaceManager = this.target.tools[this.spaceManager];
+                spaceManager.clearFeatures();
+                spaceManager.showLayer(this.id);
             },
             "collapse": function() {
-                this.target.tools[this.spaceManager].hideLayer(this.id);
                 this.target.tools[this.closureManager].deactivate();
+                var spaceManager = this.target.tools[this.spaceManager];
+                spaceManager.clearFeatures();
+                spaceManager.hideLayer(this.id);
             },
             scope: this
         });
