@@ -82,9 +82,6 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                             return false;
                         }
                     },
-                    collapse: function() {
-                        this.tools["generic-featuremanager"].clearFeatures();
-                    },
                     scope: this
                 }
             }, "map"]
