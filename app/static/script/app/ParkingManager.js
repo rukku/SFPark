@@ -239,6 +239,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             outputTarget: "grid",
             outputConfig: {id: "featuregrid-output"},
             alwaysDisplayOnMap: true,
+            selectOnMap: true,
             autoExpand: true,
             autoCollapse: true
         }, {
