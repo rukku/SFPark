@@ -162,6 +162,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             fields: config.spacesFields
         }, {
             ptype: "app_groupmanager",
+            id: "group-manager",
             safePanels: ["tree"],
             outputTarget: "group-editor",
             actionTarget: "group-editor.tbar",
@@ -249,7 +250,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "app_addremovespaces",
             spaceManager: "space-manager",
             featureManager: "closure-manager"
-        }*/];
+        }*/].concat(config.tools);
 
         ParkingManager.superclass.constructor.apply(this, arguments);
     }
