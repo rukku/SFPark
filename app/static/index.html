@@ -32,6 +32,12 @@
         <!-- ParkingManager resources -->
         <link rel="stylesheet" type="text/css" href="theme/app/style.css">
         <script type="text/javascript" src="script/ParkingManager.js"></script> 
+        
+        <style type="text/css">
+            .x-menu-item .google-icon {
+                background-image: url(http://www.google.com/favicon.ico);
+            }
+        </style>
 
         <script type="text/javascript">
 
@@ -131,7 +137,32 @@
                     "altsch4clr", "altsch4des", "altsch4fm", "altsch4to", "altsch4day", 
                     "altsch4tl", "altsch5clr", "altsch5des", "altsch5fm", "altsch5to", 
                     "altsch5day", "altsch5tl"
-                ]
+                ],
+                
+                tools: [{
+                    ptype: "app_groupactions",
+                    groupManager: "group-manager",
+                    actions: [{
+                        menuText: "Raw group view",
+                        urlTemplate: "/geoserver/wms/reflect?layers=sfpark:spaces&width=400&featureid={spaces}",
+                        // overrides global outputConfig
+                        outputConfig: {
+                            width: 414,
+                            height: 406,
+                            bodyStyle: {backgroundColor: "white"}
+                        }
+                    }, {
+                        menuText: "Search for title",
+                        urlTemplate: "http://google.com/search?q={title}",
+                        iconCls: "google-icon"
+                    }],
+                    outputConfig: {
+                        width: 800,
+                        height: 600,
+                        collapsible: true,
+                        maximizable: true
+                    }
+                }]
                 
             });
 
