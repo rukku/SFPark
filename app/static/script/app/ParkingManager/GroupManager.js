@@ -211,7 +211,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  this when the group feature store is ready.
      */
     initContainer: function() {
-        this.container = new Ext.Container({
+        this.container = new Ext.Container(Ext.apply({
             layout: "border",
             items: [{
                 layout: "form",
@@ -250,6 +250,9 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 region: "center",
                 ref: "gridContainer"
             }],
+            contextMenu: new Ext.menu.Menu({
+                items: []
+            }),
             listeners: {
                 added: function(panel, container) {
                     container.on({
@@ -280,7 +283,8 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 },
                 scope: this
             }
-        });
+        }, this.outputConfig));
+        delete this.outputConfig;
     },
     
     activate: function() {
@@ -396,7 +400,14 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                             event.grid.getStore().save();
                         }
                     }
-                }
+                },
+                contextmenu: function(event) {
+                    var rowIndex = grid.getView().findRowIndex(event.getTarget());
+                    grid.getSelectionModel().selectRow(rowIndex);
+                    this.container.contextMenu.showAt(event.getXY());
+                    event.stopEvent();
+                },
+                scope: this
             }
         });
         
