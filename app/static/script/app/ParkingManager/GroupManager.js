@@ -217,32 +217,33 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 layout: "form",
                 region: "north",
                 border: false,
-                height: 55,
-                labelAlign: "top",
-                bodyStyle: {
-                    padding: "5px"
-                },
+                height: 74,
+                bodyStyle: "padding: 5px",
                 items: [{
-                    xtype: "textfield",
-                    name: "keywords",
-                    fieldLabel: this.searchLabel,
-                    anchor: "100%",
-                    validationDelay: 500,
-                    listeners: {
-                        valid: function(field) {
-                            var filter = new OpenLayers.Filter.Comparison({
-                                type: OpenLayers.Filter.Comparison.LIKE,
-                                property: "title",
-                                value: "*" + field.getValue() + "*"
-                            });
-                            console.log("querying");
-                            this.groupFeatureManager.loadFeatures(filter);
-                        },
-                        focus: function(field) {
-                            field.reset();
-                        },
-                        scope: this
-                    }
+                    xtype: "fieldset",
+                    title: this.searchLabel,
+                    items: [{
+                        xtype: "textfield",
+                        name: "keywords",
+                        anchor: "100%",
+                        hideLabel: true,
+                        validationDelay: 500,
+                        listeners: {
+                            valid: function(field) {
+                                var filter = new OpenLayers.Filter.Comparison({
+                                    type: OpenLayers.Filter.Comparison.LIKE,
+                                    property: "title",
+                                    value: "*" + field.getValue() + "*"
+                                });
+                                console.log("querying");
+                                this.groupFeatureManager.loadFeatures(filter);
+                            },
+                            focus: function(field) {
+                                field.reset();
+                            },
+                            scope: this
+                        }
+                    }]
                 }]
             }, {
                 xtype: "container",

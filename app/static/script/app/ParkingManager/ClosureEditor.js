@@ -7,6 +7,12 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = app_closureeditor */
     ptype: "app_closureeditor",
     
+    /** api: config[searchLabel]
+     *  ``String``
+     *  Label for search input (i18n).
+     */
+    searchLabel: "Search",
+    
     /** api: config[safePanels]
      *  ``Array`` List of ids of panels on the same accordion that are
      *  safe to switch to while this tool is active. When switching to any
@@ -92,82 +98,94 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     },
     
     addOutput: function(config) {
-        var output = ParkingManager.ClosureEditor.superclass.addOutput.call(this, {
+        var output;
+        
+        function filter () {
+            var filters = [];
+            var description = output.description.getValue();
+            var effectiveFrom = output.effectiveFrom.getValue();
+            effectiveFrom = effectiveFrom instanceof Date ? effectiveFrom.format("Y-m-d\\Z") : "1970-01-01Z";
+            var effectiveTo = output.effectiveTo.getValue();
+            effectiveTo = effectiveTo instanceof Date ? effectiveTo.format("Y-m-d\\Z") : "2169-12-31Z";
+            if (output.description.getValue()) {
+                filters.push(new OpenLayers.Filter.Comparison({
+                    type: OpenLayers.Filter.Comparison.LIKE,
+                    property: "event_desc",
+                    value: "*" + output.description.getValue() + "*"
+                }))
+            }
+            filters.push(new OpenLayers.Filter.Comparison({
+                type: OpenLayers.Filter.Logical.OR,
+                filters: [
+                    new OpenLayers.Filter.Comparison({
+                        type: OpenLayers.Filter.Comparison.BETWEEN,
+                        property: "eff_from_dt",
+                        lowerBoundary: effectiveFrom,
+                        upperBoundary: effectiveTo
+                    }),
+                    new OpenLayers.Filter.Comparison({
+                        type: OpenLayers.Filter.Comparison.BETWEEN,
+                        property: "eff_to_dt",
+                        lowerBoundary: effectiveFrom,
+                        upperBoundary: effectiveTo
+                    })
+                ]
+            }))
+            var filter;
+            if (filters.length) {
+                filter = new OpenLayers.Filter.Logical({
+                    type: OpenLayers.Filter.Logical.AND,
+                    filters: filters
+                })
+            }
+            this.target.tools[this.closureManager].loadFeatures(filter);
+        }
+        
+        output = ParkingManager.ClosureEditor.superclass.addOutput.call(this, {
             xtype: "container",
             layout: "border",
             items: [{
                 xtype: "form",
                 region: "north",
                 border: false,
-                height: 163,
-                labelWidth: 45,
+                labelWidth: 80,
+                height: 126,
                 bodyStyle: "padding: 5px",
                 items: [{
-                    xtype: "textfield",
-                    ref: "../description",
-                    fieldLabel: "Search",
-                    anchor: "100%"
-                }, {
                     xtype: "fieldset",
-                    title: "Date Range",
-                    labelWidth: 80,
+                    title: this.searchLabel,
                     defaults: {anchor: "100%"},
                     items: [{
+                        xtype: "textfield",
+                        ref: "../../description",
+                        hideLabel: true,
+                        validationDelay: 500,
+                        listeners: {
+                            "valid": filter,
+                            "focus": function(field) {
+                                field.reset();
+                            },
+                            scope: this
+                        }
+                    }, {
                         xtype: "datefield",
                         ref: "../../effectiveFrom",
                         fieldLabel: "Effective from",
-                        format: "Y-m-d"
+                        format: "Y-m-d",
+                        listeners: {
+                            "valid": filter,
+                            scope: this
+                        }
                     }, {
                         xtype: "datefield",
                         ref: "../../effectiveTo",
                         fieldLabel: "Effective to",
-                        format: "Y-m-d"
+                        format: "Y-m-d",
+                        listeners: {
+                            "valid": filter,
+                            scope: this
+                        }
                     }]                    
-                }],
-                buttons: [{
-                    xtype: "button",
-                    text: "Update list",
-                    handler: function() {
-                        var filters = [];
-                        var description = output.description.getValue();
-                        var effectiveFrom = output.effectiveFrom.getValue();
-                        effectiveFrom = effectiveFrom instanceof Date ? effectiveFrom.format("Y-m-d\\Z") : "1970-01-01Z";
-                        var effectiveTo = output.effectiveTo.getValue();
-                        effectiveTo = effectiveTo instanceof Date ? effectiveTo.format("Y-m-d\\Z") : "2169-12-31Z";
-                        if (output.description.getValue()) {
-                            filters.push(new OpenLayers.Filter.Comparison({
-                                type: OpenLayers.Filter.Comparison.LIKE,
-                                property: "event_desc",
-                                value: "*" + output.description.getValue() + "*"
-                            }))
-                        }
-                        filters.push(new OpenLayers.Filter.Comparison({
-                            type: OpenLayers.Filter.Logical.OR,
-                            filters: [
-                                new OpenLayers.Filter.Comparison({
-                                    type: OpenLayers.Filter.Comparison.BETWEEN,
-                                    property: "eff_from_dt",
-                                    lowerBoundary: effectiveFrom,
-                                    upperBoundary: effectiveTo
-                                }),
-                                new OpenLayers.Filter.Comparison({
-                                    type: OpenLayers.Filter.Comparison.BETWEEN,
-                                    property: "eff_to_dt",
-                                    lowerBoundary: effectiveFrom,
-                                    upperBoundary: effectiveTo
-                                })
-                            ]
-                        }))
-                        var filter;
-                        if (filters.length) {
-                            filter = new OpenLayers.Filter.Logical({
-                                type: OpenLayers.Filter.Logical.AND,
-                                filters: filters
-                            })
-                        }
-                        this.target.tools[this.closureManager].loadFeatures(filter);
-                    },
-                    scope: this
                 }]
             }, {
                 id: this.featureGridTarget,
