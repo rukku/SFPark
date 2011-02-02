@@ -256,11 +256,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 modal: true,
                 closeAction: "hide"
             }
-        }/*, {
-            ptype: "app_addremovespaces",
-            spaceManager: "space-manager",
-            featureManager: "closure-manager"
-        }*/].concat(config.tools);
+        }].concat(config.tools);
 
         ParkingManager.superclass.constructor.apply(this, arguments);
     }
