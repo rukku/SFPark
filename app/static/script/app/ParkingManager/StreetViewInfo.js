@@ -7,10 +7,21 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = app_streetviewinfo */
     ptype: "app_streetviewinfo",
     
+    /** api: config[outputTarget]
+     *  ``String`` Popups created by this tool are added to the map by default.
+     */
+    outputTarget: "map",
+
     /** private: property[popup]
      *  ``GeoExt.Popup``
      */
     popup: null,
+
+    /** api: config[popupTitle]
+     *  ``String``
+     *  Text for feature info window title (i18n).
+     */
+    popupTitle: "Parking Space Info",
 
     /** api: config[infoActionTip]
      *  ``String``
@@ -92,7 +103,9 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
         }
         var feature = event.features && event.features[0];
         if (feature) {
-            this.popup = new GeoExt.Popup({
+            this.popup = this.addOutput({
+                xtype: "gx_popup",
+                title: this.popupTitle,
                 location: event.xy,
                 map: this.target.mapPanel,
                 maximizable: true,
@@ -122,7 +135,6 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                     }]
                 }]
             });
-            this.popup.show();
         }
     },
     

@@ -97,6 +97,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "app_streetviewinfo",
             toggleGroup: "main",
             actionTarget: "paneltbar",
+            outputConfig: {width: 450, height: 425},
             infoActionTip: "Get Parking Space Info",
             layer: {
                 source: "local",
