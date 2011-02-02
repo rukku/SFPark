@@ -94,6 +94,13 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "gxp_navigationhistory",
             actionTarget: "paneltbar"
         }, {
+            ptype: "gxp_measure",
+            actionTarget: "paneltbar",
+            toggleGroup: "main"
+        }, {
+            actions: ["-"],
+            actionTarget: "paneltbar"
+        }, {
             ptype: "app_streetviewinfo",
             toggleGroup: "main",
             actionTarget: "paneltbar",
