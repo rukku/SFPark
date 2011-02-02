@@ -25,7 +25,7 @@ ParkingManager.SpacesEditor = Ext.extend(gxp.plugins.Tool, {
             },
             scope: this
         });
-        ParkingManager.SpacesEditor.superclass.addOutput.apply(this, arguments);
+        // don't call super, because our real output is the FeatureEditor
     }
 
 });

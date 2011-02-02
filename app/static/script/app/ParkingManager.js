@@ -164,6 +164,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             autoLoadFeatures: true,
             actionTarget: "space-editor.tbar",
             outputTarget: "space-editor",
+            outputConfig: {title: "Parking Space"},
             toggleGroup: "main",
             createFeatureActionText: "New space",
             editFeatureActionText: "Modify space",
@@ -209,6 +210,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             featureManager: "closure-manager",
             snappingAgent: "curb-snapping",
             actionTarget: "closure-editor.tbar",
+            outputConfig: {title: "Closure"},
             toggleGroup: "main",
             createFeatureActionText: "New closure",
             editFeatureActionText: "Modify closure"
