@@ -7,7 +7,18 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
     defaultSourceType: "gxp_wmssource",
 
     constructor: function(config) {
-
+        
+        Ext.applyIf(config.map, {
+            id: "map",
+            region: "center",
+            controls: [
+                new OpenLayers.Control.Navigation({zoomWheelOptions: {interval: 250}}),
+                new OpenLayers.Control.PanPanel({slideRatio: .5}),
+                new OpenLayers.Control.ZoomPanel(),
+                new OpenLayers.Control.Attribution()
+            ]
+        });
+        
         config.mapItems = [{
             xtype: "gx_zoomslider",
             vertical: true,
