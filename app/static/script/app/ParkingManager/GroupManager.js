@@ -2,6 +2,14 @@
  * @require ParkingManager.js
  */
 
+/** api: constructor
+ *  .. class:: GroupManager(config)
+ *
+ *    A manager for parking groups with a grid and a search form. The output
+ *    of this tool will also have a context menu on the grid. To reference
+ *    this context menu as actionTarget for other tools, configure an id in the
+ *    tree's outputConfig, and use the id with ".contextMenu" appended.
+ */
 ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     
     /** api: ptype = app_groupmanager */
@@ -38,7 +46,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     searchLabel: "Search",
     
     /** api: config[id]
-     *  ``String`` identifier for this tool. If provided, the
+     *  ``String`` Optional identifier for this tool. The
      *  :class:`gxp.plugins.FeatureManager` for managing the ``layer`` will be
      *  assigned the provided id with "-groupfeaturemanager" appended.
      */
@@ -173,7 +181,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     initGroupFeatureManager: function() {
         this.groupFeatureManager = new gxp.plugins.FeatureManager({
-            id: this.id ? this.id + "-groupfeaturemanager" : undefined,
+            id: this.id + "-groupfeaturemanager",
             maxFeatures: this.maxFeatures,
             paging: false,
             autoLoadFeatures: true,
@@ -242,7 +250,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                                     property: "title",
                                     value: "*" + field.getValue() + "*"
                                 });
-                                console.log("querying");
                                 this.groupFeatureManager.loadFeatures(filter);
                             },
                             focus: function(field) {
@@ -258,9 +265,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 region: "center",
                 ref: "gridContainer"
             }],
-            contextMenu: new Ext.menu.Menu({
-                items: []
-            }),
             listeners: {
                 added: function(panel, container) {
                     container.on({
@@ -290,7 +294,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     }
                 },
                 scope: this
-            }
+            },
+            contextMenu: new Ext.menu.Menu({
+                items: []
+            })
         }, this.outputConfig));
         delete this.outputConfig;
     },
@@ -384,9 +391,11 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 },
                 contextmenu: function(event) {
                     var rowIndex = grid.getView().findRowIndex(event.getTarget());
-                    grid.getSelectionModel().selectRow(rowIndex);
-                    this.container.contextMenu.showAt(event.getXY());
-                    event.stopEvent();
+                    if (rowIndex !== false) {
+                        grid.getSelectionModel().selectRow(rowIndex);
+                        this.container.contextMenu.showAt(event.getXY());
+                        event.stopEvent();
+                    }
                 },
                 scope: this
             }

@@ -26,6 +26,12 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     /** api: config[closureManager]
      *  ``String`` FeatureManager for the Closures layer
      */
+     
+    /** api: config[id]
+     *  ``String`` id to reference this tools. To reference the output target
+     *  of the :class:`gxp.plugins.FeatureGrid` that this tool creates, use
+     *  this tool's id and append "-gridoutput".
+     */
     
     /** private: property[geomModified]
      *  ``Object`` keys are feature ids of features with modified geometries;
@@ -92,7 +98,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         new gxp.plugins.FeatureGrid({
             featureManager: this.closureManager,
             outputTarget: this.featureGridTarget,
-            outputConfig: {border: false},
+            outputConfig: {border: false, id: this.id + "-gridoutput"},
             alwaysDisplayOnMap: true
         }).init(target);
     },

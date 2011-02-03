@@ -241,9 +241,6 @@ div.map-overlay div.overlay-element {
 .x-btn .app-icon-addgroup, .x-menu-item .app-icon-addgroup, .sfpark .x-btn .gxp-icon-addfeature {
     background-image: url(img/silk/add.png);
 }
-.x-btn .app-icon-process, .x-menu-item .app-icon-process {
-    background-image: url(img/silk/cog.png);
-}
 
 .x-action-col-icon.app-icon-removegroup {
     width: 16px;

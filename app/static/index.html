@@ -138,8 +138,9 @@
                 ],
                 
                 tools: [{
-                    ptype: "app_groupactions",
-                    groupManager: "group-manager",
+                    ptype: "gxp_selectedfeatureactions",
+                    featureManager: "group-manager-groupfeaturemanager",
+                    actionTarget: "groupgridcontainer.contextMenu",
                     actions: [{
                         menuText: "Raw group view",
                         urlTemplate: "/geoserver/wms/reflect?layers=sfpark:spaces&width=400&featureid={spaces}",
@@ -152,6 +153,30 @@
                     }, {
                         menuText: "Search for title",
                         urlTemplate: "http://google.com/search?q={title}",
+                        iconCls: "google-icon"
+                    }],
+                    outputConfig: {
+                        width: 800,
+                        height: 600,
+                        collapsible: true,
+                        maximizable: true
+                    }
+                }, {
+                    ptype: "gxp_selectedfeatureactions",
+                    featureManager: "closure-manager",
+                    actionTarget: "closureeditor-gridoutput.contextMenu",
+                    actions: [{
+                        menuText: "Raw group view",
+                        urlTemplate: "/geoserver/wms/reflect?layers=sfpark:spaces&width=400&featureid={spaces}",
+                        // overrides global outputConfig
+                        outputConfig: {
+                            width: 414,
+                            height: 406,
+                            bodyStyle: {backgroundColor: "white"}
+                        }
+                    }, {
+                        menuText: "Search for description",
+                        urlTemplate: "http://google.com/search?q={event_desc}",
                         iconCls: "google-icon"
                     }],
                     outputConfig: {
