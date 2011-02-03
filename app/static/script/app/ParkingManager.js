@@ -33,7 +33,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 items: [{
                     iconCls: "icon-geoexplorer",
                     disabled: true
-                }, "SFPark", "-"]
+                }, "SFPark", "-", "-"]
             },
             items: [{
                 xtype: "panel",
@@ -58,17 +58,25 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                     id: "space-editor",
                     title: "Parking Spaces",
                     layout: "fit",
-                    tbar: []
+                    tbar: {
+                        id: "spacetbar",
+                        cls: "sfpark",
+                        items: ["->"]
+                    }
                 }, {
                     id: "group-editor",
                     title: "Group Management",
                     layout: "fit",
-                    tbar: []
+                    tbar: ["->"]
                 }, {
                     id: "closure-editor",
                     title: "Closure Management",
                     layout: "fit",
-                    tbar: []
+                    tbar: {
+                        id: "closuretbar",
+                        cls: "sfpark",
+                        items: ["->"]
+                    }
                 }]
             }, {
                 region: "south",
@@ -100,17 +108,14 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
 
         config.tools = [{
             ptype: "gxp_zoomtoextent",
-            actionTarget: "paneltbar"
+            actionTarget: {target: "paneltbar", index: 3}
         }, {
             ptype: "gxp_navigationhistory",
-            actionTarget: "paneltbar"
+            actionTarget: {target: "paneltbar", index: 4}
         }, {
             ptype: "gxp_measure",
-            actionTarget: "paneltbar",
+            actionTarget: {target: "paneltbar", index: 6},
             toggleGroup: "main"
-        }, {
-            actions: ["-"],
-            actionTarget: "paneltbar"
         }, {
             ptype: "app_streetviewinfo",
             toggleGroup: "main",
@@ -173,19 +178,33 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             featureManager: "space-manager",
             snappingAgent: "curb-snapping",
             autoLoadFeatures: true,
-            actionTarget: "space-editor.tbar",
+            actionTarget: {target: "spacetbar", index: 0},
             outputTarget: "space-editor",
             outputConfig: {title: "Parking Space"},
             toggleGroup: "main",
-            createFeatureActionText: "New space",
-            editFeatureActionText: "Modify space",
+            createFeatureActionText: "Add",
+            createFeatureActionTip: "Create a new parking space",
+            editFeatureActionText: "Edit",
+            editFeatureActionTip: "Select and edit an existing parking space",
             fields: config.spacesFields
+        }, {
+            ptype: "gxp_deleteselectedfeatures",
+            featureManager: "space-manager",
+            buttonText: "Delete",
+            tooltip: "Delete the selected parking space",
+            deleteFeatureMsg: "Are you sure you want to delete this parking space?",
+            actionTarget: {target: "spacetbar", index: 2}
+        }, {
+            ptype: "gxp_zoomtoselectedfeatures",
+            featureManager: "space-manager",
+            actionTarget: "spacetbar",
+            tooltip: "Zoom to selected parking space"
         }, {
             ptype: "app_groupmanager",
             id: "group-manager",
             safePanels: ["tree"],
             outputTarget: "group-editor",
-            actionTarget: "group-editor.tbar",
+            actionTarget: {target: "group-editor.tbar", index: 0},
             toggleGroup: "main",
             featureManager: "space-manager",
             layer: {
@@ -199,6 +218,13 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 fillColor: "#ff0000",
                 fillOpacity: 0.2
             }
+        }, {
+            ptype: "gxp_deleteselectedfeatures",
+            featureManager: "group-manager-groupfeaturemanager",
+            buttonText: "Delete",
+            tooltip: "Delete the selected group",
+            deleteFeatureMsg: "Are you sure you want to delete this group?",
+            actionTarget: {target: "group-editor.tbar", index: 2}
         }, {
             ptype: "gxp_zoomtodataextent",
             featureManager: "space-manager",
@@ -220,15 +246,24 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             excludeFields: ["spaces"],
             featureManager: "closure-manager",
             snappingAgent: "curb-snapping",
-            actionTarget: "closure-editor.tbar",
+            actionTarget: {target: "closuretbar", index: 0},
             outputConfig: {title: "Closure"},
             toggleGroup: "main",
-            createFeatureActionText: "New closure",
-            editFeatureActionText: "Modify closure"
+            createFeatureActionText: "Add",
+            createFeatureActionTip: "Create a new closure",
+            editFeatureActionText: "Edit",
+            editFeatureActionTip: "Select and edit an existing closure"
+        }, {
+            ptype: "gxp_deleteselectedfeatures",
+            featureManager: "closure-manager",
+            buttonText: "Delete",
+            tooltip: "Delete the selected closure",
+            deleteFeatureMsg: "Are you sure you want to delete this closure?",
+            actionTarget: {target: "closuretbar", index: 2}
         }, {
             ptype: "gxp_zoomtoselectedfeatures",
             featureManager: "closure-manager",
-            actionTarget: "closure-editor.tbar",
+            actionTarget: "closuretbar",
             tooltip: "Zoom to selected closure"
         }, {
             ptype: "app_closureeditor",

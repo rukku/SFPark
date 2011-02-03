@@ -234,11 +234,11 @@ div.map-overlay div.overlay-element {
     cursor: pointer;
 }
 
-/* GroupManager */
-.x-btn .app-icon-boxselect, .x-menu-item .app-icon-boxselect {
+/* GroupManager and custom Add/Edit icons */
+.x-btn .app-icon-boxselect, .x-menu-item .app-icon-boxselect, .sfpark .x-btn .gxp-icon-editfeature {
     background-image: url(img/silk/cursor.png);
 }
-.x-btn .app-icon-addgroup, .x-menu-item .app-icon-addgroup {
+.x-btn .app-icon-addgroup, .x-menu-item .app-icon-addgroup, .sfpark .x-btn .gxp-icon-addfeature {
     background-image: url(img/silk/add.png);
 }
 .x-btn .app-icon-process, .x-menu-item .app-icon-process {
