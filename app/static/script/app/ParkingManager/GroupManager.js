@@ -17,43 +17,31 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for box selection button (i18n).
      */
-    addActionText: "New group",
+    addActionText: "Add",
     
     /** api: config[modifyActionTip]
      *  ``String``
      *  Text for box selection tooltip (i18n).
      */
-    modifyActionTip: "Add or remove from group",
+    modifyActionTip: "Add to or remove from group",
     
     /** api: config[modifyActionText]
      *  ``String``
      *  Text for box selection button (i18n).
      */
-    modifyActionText: "Select spaces",
+    modifyActionText: "Edit",
     
-    /** api: config[removeActionTip]
-     *  ``String``
-     *  Text for modify selection tooltip (i18n).
-     */
-    removeActionTip: "Remove group",
-
-    /** api: config[removeTitle]
-     *  ``String``
-     *  Text for delete confirmation window title (i18n).
-     */
-    removeTitle: "Remove Group",
-
-    /** api: config[removeMessage]
-     *  ``String``
-     *  Text for delete confirmation window text (i18n).
-     */
-    removeMessage: "Are you sure you want to remove this group?",
-
     /** api: config[searchLabel]
      *  ``String``
      *  Label for search input (i18n).
      */
     searchLabel: "Search",
+    
+    /** api: config[id]
+     *  ``String`` identifier for this tool. If provided, the
+     *  :class:`gxp.plugins.FeatureManager` for managing the ``layer`` will be
+     *  assigned the provided id with "-groupfeaturemanager" appended.
+     */
     
     /** api: config[removeModifierKey]
      *  ``String``
@@ -185,6 +173,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     initGroupFeatureManager: function() {
         this.groupFeatureManager = new gxp.plugins.FeatureManager({
+            id: this.id ? this.id + "-groupfeaturemanager" : undefined,
             maxFeatures: this.maxFeatures,
             paging: false,
             autoLoadFeatures: true,
@@ -195,9 +184,11 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     if (store) {
                         // featureStore is set
                         this.addComponents();
+                        this.addLayerEvents();
                     } else {
                         // no featureStore, remove components
                         this.container.gridContainer.removeAll();
+                        this.removeLayerEvents();
                     }
                 },
                 scope: this
@@ -206,6 +197,22 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
         this.groupFeatureManager.init(this.target);
     },
     
+    addLayerEvents: function() {
+        this.groupFeatureManager.featureLayer.events.on({
+            "featureselected": this.onGroupSelect,
+            "featureunselected": this.onGroupUnselect,
+            scope: this
+        });
+    },
+    
+    removeLayerEvents: function() {
+        this.groupFeatureManager.featureLayer.events.un({
+            "featureselected": this.onGroupSelect,
+            "featureunselected": this.onGroupUnselect,
+            scope: this
+        });
+    },
+
     /** private: method[initContainer]
      *  Create the primary output container.  All other items will be added to 
      *  this when the group feature store is ready.
@@ -312,7 +319,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
      */
     addComponents: function() {
         var modify = this.modify;
-        
+        var layer = this.groupFeatureManager.featureLayer;
         var grid = new Ext.grid.EditorGridPanel({
             ref: "../grid",
             autoScroll: true,
@@ -323,14 +330,15 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 listeners: {
                     rowselect: function(sm, rowIndex, record) {
                         this.selectedGroup = record;
-                        this.fetchGroupSpaces(record);
-                        modify.enable();
+                        var feature = record.getFeature();
+                        layer.selectedFeatures.push(feature);
+                        layer.events.triggerEvent("featureselected", {feature: feature});
                     },
                     rowdeselect: function(sm, rowIndex, record) {
                         this.selectedGroup = null;
-                        this.target.tools[this.featureManager].clearFeatures();
-                        modify.control.deactivate();
-                        modify.disable();
+                        var feature = record.getFeature();
+                        layer.selectedFeatures.remove(feature);
+                        layer.events.triggerEvent("featureunselected", {feature: feature});
                     },
                     scope: this
                 }
@@ -360,34 +368,6 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                     }
                     return count;
                 }
-            }, {
-                xtype: "actioncolumn",
-                width: 30,
-                fixed: true,
-                menuDisabled: true,
-                hideable: false,
-                items: [{
-                    iconCls: "app-icon-removegroup",
-                    tooltip: this.removeActionTip,
-                    handler: function(grid, rowIndex) {
-                        Ext.Msg.confirm(this.removeTitle, this.removeMessage, function(btn) {
-                            if (btn == "yes") {
-                                if (grid.getSelectionModel().isSelected(rowIndex)) {
-                                    modify.control.deactivate();
-                                    modify.disable();
-                                }
-                                this.target.tools[this.featureManager].clearFeatures();
-                                var store = grid.store;
-                                store._removing = true; // TODO: remove after http://trac.geoext.org/ticket/141
-                                store.getAt(rowIndex).getFeature().state = OpenLayers.State.DELETE; // TODO: remove after http://trac.geoext.org/ticket/141
-                                store.removeAt(rowIndex);
-                                delete store._removing; // TODO: remove after http://trac.geoext.org/ticket/141
-                                store.save();
-                            }
-                        }, this);
-                    },
-                    scope: this
-                }]
             }],
             autoExpandColumn: "title",
             listeners: {
@@ -420,7 +400,8 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
 
     },
     
-    fetchGroupSpaces: function(record) {
+    onGroupSelect: function(evt) {
+        var record = this.groupFeatureManager.featureStore.getRecordFromFeature(evt.feature);
         var spaces = (record.get("spaces") || "").split(",");
         if (spaces.length && spaces[0]) {
             var filter = new OpenLayers.Filter.FeatureId({fids: spaces});
@@ -428,6 +409,13 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 this.onFeatureLoad(features, record);
             }, this);
         }
+        this.modify.enable();
+    },
+    
+    onGroupUnselect: function(evt) {
+        this.target.tools[this.featureManager].clearFeatures();
+        this.modify.control.deactivate();
+        this.modify.disable();
     },
 
     /** api: method[addOutput]
