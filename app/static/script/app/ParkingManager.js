@@ -117,6 +117,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             actionTarget: "paneltbar",
             outputConfig: {width: 450, height: 425},
             infoActionTip: "Get Parking Space Info",
+            headingAttribute: "orientatio",
             layer: {
                 source: "local",
                 name: "sfpark:spaces"

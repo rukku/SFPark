@@ -46,12 +46,20 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
      *  Header for the value column in details grid (i18n).
      */
     valueColumnHeader: "Value",
-     
+
     /** api: config[detailsTitle]
      *  ``String``
      *  Title for details tab (i18n).
      */
     detailsTitle: "Details",
+
+    /** api: config[headingAttribute]
+     *  ``String``
+     *  Optional feature attribute name with heading information.  Values should
+     *  be degrees clockwise relative to north.  If present, this value will be
+     *  used to orient the camera in the street view.
+     */
+    headingAttribute: null,
 
     /** api: config[fields]
      *  ``Array``
@@ -131,6 +139,7 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                     }, {
                         xtype: "gxp_googlestreetviewpanel",
                         title: this.streetViewTitle,
+                        heading: this.headingAttribute && Number(feature.attributes[this.headingAttribute]) || 0,
                         zoom: 1
                     }]
                 }]
