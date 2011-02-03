@@ -8,7 +8,8 @@ ParkingManager.SpacesEditor = Ext.extend(gxp.plugins.Tool, {
     ptype: "app_spaceseditor",
     
     /** private: property[editor]
-     *  ``gxp.plugins.FeatureEditor``
+     *  ``gxp.plugins.FeatureEditor`` This tool creates a FeatureEditor, which
+     *  will be configured just by passing this tool's configuration object.
      */
     
     init: function(target) {
