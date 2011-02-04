@@ -172,7 +172,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 name: "sfpark:city_curbs",
                 maxResolution: 0.6,
                 node: false,
-                vertex: false
+                vertex: false,
+                tolerance: 10 // in pixels - default is 10
             }]
         }, {
             ptype: "app_spaceseditor",
