@@ -127,7 +127,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 source: "local",
                 name: "sfpark:spaces"
             },
-            fields: config.spacesFields
+            fields: config.spacesFields,
+            tolerance: 6 // pixel radius around center point
         }, {
             ptype: "gxp_googlegeocoder",
             outputTarget: "paneltbar",
@@ -188,7 +189,8 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             createFeatureActionTip: "Create a new parking space",
             editFeatureActionText: "Edit",
             editFeatureActionTip: "Select and edit an existing parking space",
-            fields: config.spacesFields
+            fields: config.spacesFields,
+            tolerance: 6 // pixel radius around center point
         }, {
             ptype: "gxp_deleteselectedfeatures",
             featureManager: "space-manager",
