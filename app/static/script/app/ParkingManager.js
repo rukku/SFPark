@@ -282,17 +282,30 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "gxp_featuremanager",
             id: "generic-featuremanager",
-            maxFeatures: 50
+            maxFeatures: 50,
+            symbolizer: {
+                pointRadius: 6,
+                graphicName: "circle",
+                fillColor: "#ff0000",
+                fillOpacity: 0.4,
+                strokeWidth: 2,
+                strokeColor: "#ffcc33",
+                strokeOpacity: 0.8
+            }
+        }, {
+            ptype: "gxp_wmsfilterview",
+            featureManager: "generic-featuremanager"
         }, {
             ptype: "gxp_featuregrid",
             id: "featuregrid",
             featureManager: "generic-featuremanager",
             outputTarget: "grid",
             outputConfig: {id: "featuregrid-output"},
-            alwaysDisplayOnMap: true,
+            showDisplayButton: false,
             selectOnMap: true,
             autoExpand: true,
-            autoCollapse: true
+            autoCollapse: true,
+            tolerance: 6 // pixel radius around point/line center
         }, {
             ptype: "gxp_zoomtoselectedfeatures",
             featureManager: "generic-featuremanager",
