@@ -92,6 +92,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
                 //TODO move this to its own component - no js code in this
                 // config object please
                 listeners: {
+                    collapse: function() {
+                        this.tools["generic-featuremanager"].clearFeatures();
+                    },
                     beforeexpand: function() {
                         var featureStore = this.tools["generic-featuremanager"].featureStore;
                         if (!(featureStore && featureStore.getCount())) {
