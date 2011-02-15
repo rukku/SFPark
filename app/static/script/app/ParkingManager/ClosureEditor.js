@@ -110,9 +110,9 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             var filters = [];
             var description = output.description.getValue();
             var effectiveFrom = output.effectiveFrom.getValue();
-            effectiveFrom = effectiveFrom instanceof Date ? effectiveFrom.format("Y-m-d\\Z") : "1970-01-01Z";
+            effectiveFrom = effectiveFrom instanceof Date ? effectiveFrom.format("c") : "1970-01-01";
             var effectiveTo = output.effectiveTo.getValue();
-            effectiveTo = effectiveTo instanceof Date ? effectiveTo.format("Y-m-d\\Z") : "2169-12-31Z";
+            effectiveTo = effectiveTo instanceof Date ? effectiveTo.format("c") : "2169-12-31";
             if (output.description.getValue()) {
                 filters.push(new OpenLayers.Filter.Comparison({
                     type: OpenLayers.Filter.Comparison.LIKE,
@@ -177,7 +177,6 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                         xtype: "datefield",
                         ref: "../../effectiveFrom",
                         fieldLabel: "Effective from",
-                        format: "Y-m-d",
                         listeners: {
                             "valid": filter,
                             scope: this
@@ -186,7 +185,6 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                         xtype: "datefield",
                         ref: "../../effectiveTo",
                         fieldLabel: "Effective to",
-                        format: "Y-m-d",
                         listeners: {
                             "valid": filter,
                             scope: this
