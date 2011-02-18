@@ -38,6 +38,10 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
      *  value is true
      */
     
+    /** private: property[spacesAttribute]
+     *  ``String`` the name of the spaces attribute
+     */
+    
     /** private override */
     autoActivate: false,
     
@@ -78,14 +82,18 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 scope: this
             })
         }, this, {single: true});
-        closureManager.on("layerchange", function() {
+        closureManager.on("layerchange", function(tool, layer, schema) {
+            if (schema) {
+                var spaceField = schema.getAt(schema.find("name", /^spaces$/i));
+                this.spacesAttribute = spaceField.get("name");
+            }
             closureManager.featureStore && closureManager.featureStore.on({
                 "update": function(store, record, operation) {
                     var feature = record.getFeature();
                     if (operation === Ext.data.Record.COMMIT) {
                         this.geomModified[feature.id] = true;
                     }
-                    if (!feature.attributes.spaces || this.geomModified[feature.id]) {
+                    if (!feature.attributes[this.spacesAttribute] || this.geomModified[feature.id]) {
                         delete this.geomModified[feature.id];
                         this.setSpaces(feature);
                     }
@@ -254,19 +262,19 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             distance: 5
         });
         var rec = closureManager.featureStore.getRecordFromFeature(feature);
-        var currentFids = (rec.get("spaces") || "").split(",");
+        var currentFids = (rec.get(this.spacesAttribute) || "").split(",");
         spacesManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
             for (var i=features.length-1; i>=0; --i) {
-                fids[i] = features[i].fid.replace("spaces.", "");
+                fids[i] = features[i].fid.split(".").pop();
             }
-            rec.set("spaces", fids.join(","));
+            rec.set(this.spacesAttribute, fids.join(","));
         });
     },
     
     selectSpaces: function(feature) {
         if (feature.attributes.spaces) {
-            var fids = feature.attributes.spaces.split(",");
+            var fids = feature.attributes[this.spacesAttribute].split(",");
             var filter = new OpenLayers.Filter.FeatureId({fids: fids});
             this.target.tools[this.spacesManager].loadFeatures(filter);
         }

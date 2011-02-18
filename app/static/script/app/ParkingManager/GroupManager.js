@@ -90,6 +90,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
       *  draw the selection lasso.
       */
 
+     /** private: property[spacesAttribute]
+      *  ``String`` the name of the spaces attribute
+      */
+
     /** private: property[selectedGroup]
      */
     
@@ -188,8 +192,10 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             autoActivate: false,
             layer: this.layer,
             listeners: {
-                layerchange: function(tool, store) {
-                    if (store) {
+                layerchange: function(tool, store, schema) {
+                    if (schema) {
+                        var spaceField = schema.getAt(schema.find("name", /^spaces$/i));
+                        this.spacesAttribute = spaceField.get("name");
                         // featureStore is set
                         this.addComponents();
                         this.addLayerEvents();
@@ -363,7 +369,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 id: "count",
                 header: "Count",
                 align: "center",
-                dataIndex: "spaces",
+                dataIndex: this.spacesAttribute,
                 menuDisabled: true,
                 width: 50,
                 editable: false,
@@ -411,7 +417,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
     
     onGroupSelect: function(evt) {
         var record = this.groupFeatureManager.featureStore.getRecordFromFeature(evt.feature);
-        var spaces = (record.get("spaces") || "").split(",");
+        var spaces = (record.get(this.spacesAttribute) || "").split(",");
         if (spaces.length && spaces[0]) {
             var filter = new OpenLayers.Filter.FeatureId({fids: spaces});
             this.target.tools[this.featureManager].loadFeatures(filter, function(features) {
@@ -455,7 +461,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 value: result
             });
         }
-        var spaces = (this.selectedGroup.get("spaces") || "").split(",");
+        var spaces = (this.selectedGroup.get(this.spacesAttribute) || "").split(",");
         if (spaces.length && spaces[0]) {
             if (event[this.removeModifierKey]) {
                 // remove from current selection
@@ -495,7 +501,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             // selection has changed, don't display spaces
             this.target.tools[this.featureManager].clearFeatures();
         } else {
-            var existing = (group.get("spaces") || "").split(",");
+            var existing = (group.get(this.spacesAttribute) || "").split(",");
             var len = features.length;
             var ids = new Array(len);
             var newIds = {};
@@ -503,7 +509,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             for (var i=0; i<len; ++i) {
                 id = features[i].fid.split(".").pop();
                 newIds[id] = true;
-                ids[i] = features[i].fid.split(".").pop();
+                ids[i] = id;
             }
             var modified = (len !== existing.length);
             if (!modified) {
@@ -515,7 +521,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                 }
             }
             if (modified) {
-                group.set("spaces", ids.join(","));
+                group.set(this.spacesAttribute, ids.join(","));
                 this.groupFeatureManager.featureStore.save();
             }
         }
