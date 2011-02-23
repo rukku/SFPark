@@ -90,8 +90,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
       *  draw the selection lasso.
       */
 
-     /** private: property[spacesAttribute]
-      *  ``String`` the name of the spaces attribute
+    /** private: property[spacesAttribute]
+     *  ``String`` the name of the spaces attribute
+     */
+
+    /** private: property[titleAttribute]
+      *  ``String`` the name of the title attribute
       */
 
     /** private: property[selectedGroup]
@@ -194,8 +198,12 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             listeners: {
                 layerchange: function(tool, store, schema) {
                     if (schema) {
+                        // get case insensitive "spaces" field
                         var spaceField = schema.getAt(schema.find("name", /^spaces$/i));
                         this.spacesAttribute = spaceField.get("name");
+                        // get case insensitive "title" field
+                        var titleField = schema.getAt(schema.find("name", /^title$/i));
+                        this.titleAttribute = titleField.get("name");
                         // featureStore is set
                         this.addComponents();
                         this.addLayerEvents();
@@ -253,7 +261,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                             valid: function(field) {
                                 var filter = new OpenLayers.Filter.Comparison({
                                     type: OpenLayers.Filter.Comparison.LIKE,
-                                    property: "title",
+                                    property: this.titleAttribute,
                                     value: "*" + field.getValue() + "*"
                                 });
                                 this.groupFeatureManager.loadFeatures(filter);
@@ -359,7 +367,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
             columns: [{
                 id: "title",
                 header: "Title",
-                dataIndex: "title",
+                dataIndex: this.titleAttribute,
                 sortable: true,
                 editor: {
                     xtype: "textfield",
