@@ -92,7 +92,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     this.geomModified[evt.feature.id] = true;
                 },
                 scope: this
-            })
+            });
         }, this, {single: true});
         closureManager.on("layerchange", function(tool, layer, schema) {
             if (schema) {
@@ -121,7 +121,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     }
                 },
                 scope: this
-            })
+            });
         }, this);
 
         // use the FeatureGrid plugin for this tool's feature grid
@@ -148,7 +148,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     type: OpenLayers.Filter.Comparison.LIKE,
                     property: this.eventDescAttribute,
                     value: "*" + output.description.getValue() + "*"
-                }))
+                }));
             }
             filters.push(new OpenLayers.Filter.Comparison({
                 type: OpenLayers.Filter.Logical.OR,
@@ -166,13 +166,13 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                         upperBoundary: effectiveTo
                     })
                 ]
-            }))
+            }));
             var filter;
             if (filters.length) {
                 filter = new OpenLayers.Filter.Logical({
                     type: OpenLayers.Filter.Logical.AND,
                     filters: filters
-                })
+                });
             }
             this.target.tools[this.closureManager].loadFeatures(filter);
         }
