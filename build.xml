@@ -84,6 +84,7 @@
         <copy todir="${build}/${ant.project.name}/WEB-INF/app/static/externals/openlayers/theme">
             <fileset dir="app/static/externals/openlayers/theme"/>
         </copy>
+        <copy file="app/static/externals/openlayers/img/blank.gif" todir="${build}/${ant.project.name}/WEB-INF/app/static/externals/openlayers/img"/>
         <copy todir="${build}/${ant.project.name}/WEB-INF/app/static/externals/gxp/src/theme">
             <fileset dir="app/static/externals/gxp/src/theme"/>
         </copy>
