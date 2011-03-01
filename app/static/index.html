@@ -45,6 +45,7 @@
             Ext.BLANK_IMAGE_URL = "theme/app/img/blank.gif";
             OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
             OpenLayers.ImgPath = "externals/openlayers/img/";
+            OpenLayers.ProxyHost = "proxy/?url=";
             OpenLayers.Layer.WMS.prototype.DEFAULT_PARAMS.transparent = true;
 
             var app = new ParkingManager({
@@ -52,7 +53,8 @@
                 sources: {
                     local: {    
                         url: "/geoserver/ows",
-                        title: "Local GeoServer"
+                        title: "Local GeoServer",
+                        version: "1.1.1"
                     },
                     osm: {
                         ptype: "gxp_osmsource"

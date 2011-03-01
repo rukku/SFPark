@@ -14,7 +14,7 @@ if (java.lang.System.getProperty("GXP_DEBUG")) {
 
     // debug specific proxy
     urls.push(
-        [(/^\/geoserver\/(.*)/), require("./proxy").pass("http://gem.demo.opengeo.org:9080/geoserver/")]
+        [(/^\/geoserver\/(.*)/), require("./proxy").pass({url: "http://sfpark.demo.opengeo.org:8080/geoserver/", preserveHost: false, allowAuth: true})]
     );
 
 }
