@@ -42,6 +42,18 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
      *  ``String`` the name of the spaces attribute
      */
     
+    /** private: property[eventDescAttribute]
+     *  ``String`` the name of the event description attribute
+     */
+
+    /** private: property[effectiveFromDateAttribute]
+     *  ``String`` the name of the effective from date attribute
+     */
+
+    /** private: property[effectiveToDateAttribute]
+     *  ``String`` the name of the effective to date attribute
+     */
+
     /** private override */
     autoActivate: false,
     
@@ -84,8 +96,18 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         }, this, {single: true});
         closureManager.on("layerchange", function(tool, layer, schema) {
             if (schema) {
+                // case insensitive spaces
                 var spaceField = schema.getAt(schema.find("name", /^spaces$/i));
                 this.spacesAttribute = spaceField.get("name");
+                // case insensitive event_desc
+                var eventDescField = schema.getAt(schema.find("name", /^event_desc$/i));
+                this.eventDescAttribute = eventDescField.get("name");
+                // case insensitive eff_from_dt
+                var effFromDtField = schema.getAt(schema.find("name", /^eff_from_dt$/i));
+                this.effectiveFromDateAttribute = effFromDtField.get("name");
+                // case insensitive eff_to_dt
+                var effToDtField = schema.getAt(schema.find("name", /^eff_to_dt$/i));
+                this.effectiveToDateAttribute = effToDtField.get("name");
             }
             closureManager.featureStore && closureManager.featureStore.on({
                 "update": function(store, record, operation) {
@@ -95,7 +117,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     }
                     if (!feature.attributes[this.spacesAttribute] || this.geomModified[feature.id]) {
                         delete this.geomModified[feature.id];
-                        this.setSpaces(feature);
+                        this.setSpaces(record);
                     }
                 },
                 scope: this
@@ -124,7 +146,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             if (output.description.getValue()) {
                 filters.push(new OpenLayers.Filter.Comparison({
                     type: OpenLayers.Filter.Comparison.LIKE,
-                    property: "event_desc",
+                    property: this.eventDescAttribute,
                     value: "*" + output.description.getValue() + "*"
                 }))
             }
@@ -133,13 +155,13 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 filters: [
                     new OpenLayers.Filter.Comparison({
                         type: OpenLayers.Filter.Comparison.BETWEEN,
-                        property: "eff_from_dt",
+                        property: this.effectiveFromDateAttribute,
                         lowerBoundary: effectiveFrom,
                         upperBoundary: effectiveTo
                     }),
                     new OpenLayers.Filter.Comparison({
                         type: OpenLayers.Filter.Comparison.BETWEEN,
-                        property: "eff_to_dt",
+                        property: this.effectiveToDateAttribute,
                         lowerBoundary: effectiveFrom,
                         upperBoundary: effectiveTo
                     })
@@ -253,22 +275,32 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
         }
     },
     
+    /** private: method[setSpaces]
+     *  :arg feature: ``OpenLayers.Feature.Vector|GeoExt.data.FeatureRecord``
+     */
     setSpaces: function(feature) {
         var closureManager = this.target.tools[this.closureManager];
         var spacesManager = this.target.tools[this.spacesManager];
+        var spacesAttribute = this.spacesAttribute;
+        var rec;
+        if (feature instanceof OpenLayers.Feature.Vector) {
+            rec = closureManager.featureStore.getRecordFromFeature(feature);
+        } else {
+            rec = feature;
+            feature = rec.getFeature();
+        }
         var filter = new OpenLayers.Filter.Spatial({
             type: OpenLayers.Filter.Spatial.DWITHIN,
             value: feature.geometry,
             distance: 5
         });
-        var rec = closureManager.featureStore.getRecordFromFeature(feature);
-        var currentFids = (rec.get(this.spacesAttribute) || "").split(",");
+        var currentFids = (rec.get(spacesAttribute) || "").split(",");
         spacesManager.loadFeatures(filter, function(features) {
             var fids = new Array(features.length);
             for (var i=features.length-1; i>=0; --i) {
                 fids[i] = features[i].fid.split(".").pop();
             }
-            rec.set(this.spacesAttribute, fids.join(","));
+            rec.set(spacesAttribute, fids.join(","));
         });
     },
     
