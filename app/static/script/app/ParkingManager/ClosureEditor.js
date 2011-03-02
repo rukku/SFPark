@@ -190,7 +190,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                 items: [{
                     xtype: "fieldset",
                     title: this.searchLabel,
-                    defaults: {anchor: "100%"},
+                    defaults: {anchor: "100%", validateOnBlur: false},
                     items: [{
                         xtype: "textfield",
                         ref: "../../description",
