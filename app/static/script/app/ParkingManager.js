@@ -111,6 +111,7 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
 
         config.tools = [{
             ptype: "gxp_zoomtoextent",
+            extent: config.map.extent,
             actionTarget: {target: "paneltbar", index: 3}
         }, {
             ptype: "gxp_navigationhistory",
