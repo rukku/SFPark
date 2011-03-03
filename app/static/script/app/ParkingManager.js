@@ -245,9 +245,9 @@ var ParkingManager = Ext.extend(gxp.Viewer, {
             ptype: "gxp_featuremanager",
             id: "closure-manager",
             autoActivate: false,
-            maxFeatures: 50,
+            maxFeatures: 250,
             autoLoadFeatures: true,
-            paging: true,
+            paging: false,
             layer: {
                 source: "local",
                 name: "sfpark:closures"
