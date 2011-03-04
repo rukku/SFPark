@@ -136,6 +136,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
     
     addOutput: function(config) {
         var output;
+        var closureManager = this.target.tools[this.closureManager];
         
         function filter () {
             var filters = [];
