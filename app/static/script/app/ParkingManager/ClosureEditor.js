@@ -175,9 +175,22 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                     filters: filters
                 });
             }
-            this.target.tools[this.closureManager].loadFeatures(filter);
+            var serializedFilter = [description, effectiveFrom, effectiveTo].join(",");
+            if (serializedFilter !== this._filter) {
+                this._filter = serializedFilter;
+                closureManager.loadFeatures(filter);
+            }
         }
         
+        function filterDone(tool, store, filter) {
+            delete this._filter;
+        }
+        closureManager.on({
+            "query": filterDone,
+            "clearfeatuers": filterDone,
+            scope: this
+        });
+
         output = ParkingManager.ClosureEditor.superclass.addOutput.call(this, {
             xtype: "container",
             layout: "border",
