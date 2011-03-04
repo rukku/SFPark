@@ -112,7 +112,7 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
             closureManager.featureStore && closureManager.featureStore.on({
                 "update": function(store, record, operation) {
                     var feature = record.getFeature();
-                    if (operation === Ext.data.Record.COMMIT) {
+                    if (operation === Ext.data.Record.COMMIT && record.dirty) {
                         this.geomModified[feature.id] = true;
                     }
                     if (!feature.attributes[this.spacesAttribute] || this.geomModified[feature.id]) {
