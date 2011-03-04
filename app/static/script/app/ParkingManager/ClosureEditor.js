@@ -77,12 +77,12 @@ ParkingManager.ClosureEditor = Ext.extend(gxp.plugins.Tool, {
                         this.selectSpaces(evt.feature);
                 },
                 "featureunselected": function(evt) {
-                    target.tools[this.spacesManager].featureStore.removeAll();
+                    target.tools[this.spacesManager].clearFeatures();
                 },
                 "featureremoved": function(evt) {
                     if (removing === false) {
                         removing = true;
-                        target.tools[this.spacesManager].featureStore.removeAll();
+                        target.tools[this.spacesManager].clearFeatures();
                     }
                 },
                 "vertexmodified": function(evt) {
