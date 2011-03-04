@@ -163,12 +163,31 @@ ParkingManager.StreetViewInfo = Ext.extend(gxp.plugins.Tool, {
                     }, {
                         xtype: "gxp_googlestreetviewpanel",
                         title: this.streetViewTitle,
-                        heading: this.headingAttribute && Number(feature.attributes[this.headingAttribute]) || 0,
+                        heading: this.getOrientationForFeature(feature),
                         zoom: 1
                     }]
                 }]
             });
         }
+    },
+    
+    /** private: method[getOrientationForFeature]
+     *  :arg feature:
+     *
+     *  Return the orientation of a feature based on the case insensitive
+     *  `headingAttribute` property.
+     */
+    getOrientationForFeature: function(feature) {
+        var orientation = 0;
+        if (this.headingAttribute) {
+            for (var attr in feature.attributes) {
+                if (attr.toUpperCase() === this.headingAttribute.toUpperCase()) {
+                    orientation = Number(feature.attributes[attr]);
+                    break;
+                }
+            }
+        }
+        return orientation;
     },
     
     /** private: method[getAttributeStore]
