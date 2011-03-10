@@ -65,12 +65,19 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
      *  be degrees clockwise relative to north.  If present, this value will be
      *  used to orient the camera in the street view.
      */
-    headingAttribute: null,
+    headingAttribute: "ORIENTATION",
 
     /** api: property[feature]
      *  ``OpenLayers.Feature.Vector`` The feature being edited/displayed.
      */
     feature: null,
+    
+    /** api: config[schema]
+     *  ``GeoExt.data.AttributeStore`` Optional. If provided, available
+     *  feature attributes will be determined from the schema instead of using
+     *  the attributes that the feature has currently set.
+     */
+    schema: null,
     
     /** api: config[readOnly]
      *  ``Boolean`` Set to true to disable editing. Default is false.
@@ -91,7 +98,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
     /** private: property[editing]
      *  ``Boolean`` If we are in editing mode, this will be true.
      */
-    editing: false,
+    editing: true,
     
     /** private: property[modifyControl]
      *  ``OpenLayers.Control.ModifyFeature`` If in editing mode, we will have
@@ -170,6 +177,19 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         if (!this.location) {
             this.location = feature
         };
+
+        if (this.schema) {
+            var attributes = {};
+            this.schema.each(function(r) {
+                var type = r.get("type");
+                if (type.match(/^[^:]*:?((Multi)?(Point|Line|Polygon|Curve|Surface|Geometry))/)) {
+                    // exclude gml geometries
+                    return;
+                }
+                attributes[name] = feature.attributes[r.get("name")];
+            }, this);
+            feature.attributes = attributes;
+        }
         
         this.anchored = !this.editing;
         
@@ -216,15 +236,13 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             scope: this
         });
         
+        this.initAttributeForm();
+        
         this.items = [{
             xtype: "tabpanel",
             border: false,
             activeTab: 0,
-            items: [{
-                xtype: "panel",
-                title: this.attributeFormTitle,
-                html: "tab 1"
-            }, {
+            items: [this.attributeForm, {
                 xtype: "gxp_googlestreetviewpanel",
                 title: this.streetViewTitle,
                 heading: this.getOrientationForFeature(feature),
@@ -278,6 +296,63 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
                 }
             },
             scope: this
+        });
+    },
+    
+    /** private: method[initAttributeForm]
+     *  Generate form for editing parking space attributes.
+     */
+    initAttributeForm: function() {
+        var attributes = this.feature.attributes;
+        this.attributeForm = new Ext.FormPanel({
+            title: this.attributeFormTitle,
+            bodyStyle: "padding: 5px 5px 0",
+            labelWidth: 100,
+            defaults: {anchor: "98%"},
+            autoScroll: true,
+            items: [{
+                xtype: "textfield",
+                name: "POST_ID",
+                fieldLabel: "Post ID",
+                regex: /^\d{3}-\d{5}$/,
+                regexText: "ID must be of the form 123-45678",
+                value: attributes.POST_ID
+            }, {
+                xtype: "combo",
+                name: "CAP_COLOR",
+                fieldLabel: "Cap Color",
+                store: ["Gray", "Orange", "Red"],
+                displayField: "field1",
+                valueField: "field1",
+                editable: false,
+                value: attributes.CAP_COLOR
+            }, {
+                xtype: "textfield", // use "datefield" if you want to allow editing
+                name: "CREATED_DT",
+                fieldLabel: "Created Date",
+                readOnly: true,
+                value: attributes.CREATED_DT || (new Date()).format("Y-m-d")
+            }, {
+                xtype: "textfield", // use "datefield" if you want to allow editing
+                name: "LAST_UPD_DT",
+                fieldLabel: "Modified Date",
+                readOnly: true,
+                value: (new Date()).format("Y-m-d")
+            }, {
+                xtype: "combo",
+                name: "SENSOR_FLAG",
+                fieldLabel: "Sensor Flag",
+                store: ["Y", "N"],
+                displayField: "field1",
+                valueField: "field1",
+                editable: false,
+                value: attributes.SENSOR_FLAG
+            }, {
+                xtype: "numberfield",
+                name: "MS_SPACE_NUM",
+                fieldLabel: "Space Number",
+                value: attributes.MS_SPACE_NUM
+            }]
         });
     },
     
@@ -345,10 +420,18 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             // http://trac.openlayers.org/ticket/2210 is fixed.
             this.modifyControl.deactivate();
             this.modifyControl.destroy();
-            
+
             var feature = this.feature;
+            
+            var form = this.attributeForm.getForm();
+
             if (feature.state === this.getDirtyState()) {
                 if (save === true) {
+                    // apply modified attributes to feature
+                    form.items.each(function(field) {
+                        var value = field.getValue(); // this may be an empty string
+                        feature.attributes[field.getName()] = value || field.value;
+                    });
                     this.fireEvent("featuremodified", this, feature);
                 } else if (feature.state === OpenLayers.State.INSERT) {
                     this.editing = false;
@@ -356,6 +439,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
                     this.fireEvent("canceledit", this, null);
                     this.close();
                 } else {
+                    form.reset();
                     var layer = feature.layer;
                     layer.drawFeature(feature, {display: "none"});
                     feature.geometry = this.geometry;

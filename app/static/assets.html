@@ -96,7 +96,7 @@
                     projection: "EPSG:900913",
                     units: "m",
                     numZoomLevels: 21,
-                    maxResolution: 156543.0339,
+                    maxResolution: 156543.03390625,
                     maxExtent: [
                         -20037508.34, -20037508.34,
                         20037508.34, 20037508.34
@@ -190,11 +190,15 @@
                     ptype: "gxp_featureeditor",
                     snappingAgent: "curb-snapping",
                     featureManager: "featuremanager",
-                    featureEditPopupType: "app_asseteditorpopup",
                     autoLoadFeatures: true,
                     toggleGroup: this.toggleGroup,
                     actionTarget: {target: "paneltbar", index: 8},
-                    tolerance: 6
+                    tolerance: 6,
+                    outputConfig: {
+                        xtype: "app_asseteditorpopup",
+                        width: 350,
+                        height: 350
+                    }
                 }]
                 
             });
