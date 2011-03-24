@@ -78,6 +78,11 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
      *  the attributes that the feature has currently set.
      */
     schema: null,
+
+    /** api: config[formReadOnly]
+     *  ``Boolean`` Set to true to have the form be read-only. Default is false.
+     */
+    formReadOnly: false,
     
     /** api: config[readOnly]
      *  ``Boolean`` Set to true to disable editing. Default is false.
@@ -309,7 +314,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             title: this.attributeFormTitle,
             bodyStyle: "padding: 5px 5px 0",
             labelWidth: 100,
-            defaults: {anchor: "98%"},
+            defaults: {anchor: "98%", readOnly: this.formReadOnly},
             autoScroll: true,
             items: [{
                 xtype: "textfield",
