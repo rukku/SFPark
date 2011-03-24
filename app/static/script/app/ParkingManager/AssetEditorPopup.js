@@ -253,11 +253,16 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             handler: this.showExternalForm,
             scope: this
         });
-        
-        this.initAttributeForm();
-        this.formContainer = new Ext.Panel({layout: 'fit', 
-            title: this.attributeFormTitle, items:[this.attributeForm]});
-        
+
+        if (this.feature.state === OpenLayers.State.INSERT) {
+            this.readOnly = true;
+            this.formContainer = new Ext.Panel({layout: 'fit',
+                html: this.getIframeHTML(), title: this.attributeFormTitle});
+        } else {
+            this.initAttributeForm();
+            this.formContainer = new Ext.Panel({layout: 'fit', 
+                title: this.attributeFormTitle, items:[this.attributeForm]});
+        }
         this.items = [{
             xtype: "tabpanel",
             border: false,
@@ -319,21 +324,31 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         });
     },
 
-    /** private: method[showExternalForm]
-     *  Show the external form for editing.
+    /** private: method[getIframeHTML]
+     *  Get the HTML for the iframe to show the external form application.
      */
-    showExternalForm: function() {
+    getIframeHTML: function() {
         var url = this.externalUrl;
         if (url && this.feature) {
-            url = this.externalUrl.replace("{space_id}", 
-                this.feature.attributes[this.spaceIdField]);
-            var point = this.feature.geometry.transform(
+            var space_id = this.feature.attributes[this.spaceIdField] || "";
+            url = this.externalUrl.replace("{space_id}", space_id);
+            var point = this.feature.geometry.clone().transform(
             this.feature.layer.map.getProjectionObject(),
                 new OpenLayers.Projection("EPSG:4326")
             );
             url = url.replace("{latitude}", point.y);
             url = url.replace("{longitude}", point.x);
             var html = '<iframe width="100%" height="100%" src="'+url+'" style="border: none;"></iframe>';
+            return html;
+        }
+    },
+
+    /** private: method[showExternalForm]
+     *  Show the external form for editing.
+     */
+    showExternalForm: function() {
+        var html = this.getIframeHTML();
+        if (html) {
             this.formContainer.body.update(html);
             //TODO remove the line below when
             // http://trac.openlayers.org/ticket/2210 is fixed.
