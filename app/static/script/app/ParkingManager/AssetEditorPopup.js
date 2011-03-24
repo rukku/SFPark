@@ -353,7 +353,11 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
                 this.feature.layer.map.getProjectionObject(),
                 new OpenLayers.Projection("EPSG:4326")
             );
-            var url = template.applyTemplate({space_id: space_id, latitude: point.y, longitude: point.x});
+            var url = template.applyTemplate({
+                space_id: space_id, 
+                latitude: point.y.toFixed(10),
+                longitude: point.x.toFixed(10)
+            });
             var html = '<iframe width="100%" height="100%" src="'+url+'" style="border: none;"></iframe>';
             return html;
         }
