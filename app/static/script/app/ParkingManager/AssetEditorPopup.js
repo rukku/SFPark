@@ -371,6 +371,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         this.cancelButton.hide();
         var html = this.getIframeHTML();
         if (html) {
+            this.formContainer.removeAll();
             this.formContainer.body.update(html);
             //TODO remove the line below when
             // http://trac.openlayers.org/ticket/2210 is fixed.
