@@ -84,6 +84,11 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
      *  for {space_id}.
      */
     spaceIdField: null,
+    
+    /** api: config[refreshLayerName]
+     *  ``String`` The WMS layer name to refresh after this popup is closed.
+     */
+    refreshLayerName: null,
 
     /** api: config[externalUrl]
      * ``String`` The url to the external form application to handle the editing
@@ -292,6 +297,18 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
                 if (this.editing) {
                     this.editing = null;
                     this.startEditing();
+                }
+            },
+            "close": function() {
+                if (this.refreshLayerName != null) {
+                    for (var i=0, ii=this.map.layers.length; i<ii; i++) {
+                        var layer = this.map.layers[i];
+                        if (layer instanceof OpenLayers.Layer.WMS && 
+                            layer.params.LAYERS.indexOf(this.refreshLayerName) >= 0) {
+                                layer.redraw(true);
+                                break;
+                        }
+                    }
                 }
             },
             "beforeclose": function() {
