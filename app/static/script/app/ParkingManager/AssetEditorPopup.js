@@ -326,7 +326,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         var url = this.externalUrl;
         if (url && this.feature) {
             url = this.externalUrl.replace("{space_id}", 
-                this.feature.attributes["PARKING_SPACE_INT"]);
+                this.feature.attributes[this.spaceIdField]);
             var point = this.feature.geometry.transform(
             this.feature.layer.map.getProjectionObject(),
                 new OpenLayers.Projection("EPSG:4326")
