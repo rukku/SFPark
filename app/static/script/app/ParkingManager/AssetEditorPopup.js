@@ -181,12 +181,13 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         if (this.schema) {
             var attributes = {};
             this.schema.each(function(r) {
+                var name = r.get("name");
                 var type = r.get("type");
                 if (type.match(/^[^:]*:?((Multi)?(Point|Line|Polygon|Curve|Surface|Geometry))/)) {
                     // exclude gml geometries
                     return;
                 }
-                attributes[name] = feature.attributes[r.get("name")];
+                attributes[name] = feature.attributes[name];
             }, this);
             feature.attributes = attributes;
         }
