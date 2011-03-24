@@ -4,7 +4,6 @@ var Headers = require("ringo/utils/http").Headers;
 var MemoryStream = require("io").MemoryStream;
 var objects = require("ringo/utils/objects");
 var responseForStatus = require("./util").responseForStatus;
-var defer = require("ringo/promise").defer;
 
 var URL = java.net.URL;
 
@@ -110,7 +109,6 @@ function proxyPass(config) {
     } else {
         // re-issue request
         var client = new Client();
-        // response = defer();
         var exchange = client.request({
             url: outgoing.url,
             method: outgoing.method,
