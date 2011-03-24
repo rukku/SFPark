@@ -363,6 +363,8 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
      *  Show the external form for editing.
      */
     showExternalForm: function() {
+        this.saveButton.hide();
+        this.cancelButton.hide();
         var html = this.getIframeHTML();
         if (html) {
             this.formContainer.body.update(html);
