@@ -79,6 +79,20 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
      */
     schema: null,
 
+    /** api: config[spaceIdField]
+     *  ``String`` The field name to use in the externalUrl substitution 
+     *  for {space_id}.
+     */
+    spaceIdField: null,
+
+    /** api: config[externalUrl]
+     * ``String`` The url to the external form application to handle the editing
+     * further. There can be placeholders in this url which will be substituted
+     * by the application with the actual values corresponding to the feature
+     * which is being edited, these are: {space_id}, {latitude} and {longitude}.
+     */
+    externalUrl: null,
+
     /** api: config[formReadOnly]
      *  ``Boolean`` Set to true to have the form be read-only. Default is false.
      */
@@ -236,19 +250,19 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             tooltip: this.saveButtonTooltip,
             iconCls: "save",
             hidden: true,
-            handler: function() {
-                this.stopEditing(true);
-            },
+            handler: this.showExternalForm,
             scope: this
         });
         
         this.initAttributeForm();
+        this.formContainer = new Ext.Panel({layout: 'fit', 
+            title: this.attributeFormTitle, items:[this.attributeForm]});
         
         this.items = [{
             xtype: "tabpanel",
             border: false,
             activeTab: 0,
-            items: [this.attributeForm, {
+            items: [this.formContainer, {
                 xtype: "gxp_googlestreetviewpanel",
                 title: this.streetViewTitle,
                 heading: this.getOrientationForFeature(feature),
@@ -304,6 +318,30 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             scope: this
         });
     },
+
+    /** private: method[showExternalForm]
+     *  Show the external form for editing.
+     */
+    showExternalForm: function() {
+        var url = this.externalUrl;
+        if (url && this.feature) {
+            url = this.externalUrl.replace("{space_id}", 
+                this.feature.attributes["PARKING_SPACE_INT"]);
+            var point = this.feature.geometry.transform(
+            this.feature.layer.map.getProjectionObject(),
+                new OpenLayers.Projection("EPSG:4326")
+            );
+            url = url.replace("{latitude}", point.y);
+            url = url.replace("{longitude}", point.x);
+            var html = '<iframe width="100%" height="100%" src="'+url+'" style="border: none;"></iframe>';
+            this.formContainer.body.update(html);
+            //TODO remove the line below when
+            // http://trac.openlayers.org/ticket/2210 is fixed.
+            this.modifyControl.deactivate();
+            this.modifyControl.destroy();
+            this.editing = false;
+       }
+    },
     
     /** private: method[initAttributeForm]
      *  Generate form for editing parking space attributes.
@@ -311,7 +349,6 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
     initAttributeForm: function() {
         var attributes = this.feature.attributes;
         this.attributeForm = new Ext.FormPanel({
-            title: this.attributeFormTitle,
             bodyStyle: "padding: 5px 5px 0",
             labelWidth: 100,
             defaults: {anchor: "98%", readOnly: this.formReadOnly},
