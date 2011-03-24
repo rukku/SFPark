@@ -348,13 +348,12 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
         var url = this.externalUrl;
         if (url && this.feature) {
             var space_id = this.feature.attributes[this.spaceIdField] || "";
-            url = this.externalUrl.replace("{space_id}", space_id);
+            var template = new Ext.Template(url);
             var point = this.feature.geometry.clone().transform(
-            this.feature.layer.map.getProjectionObject(),
+                this.feature.layer.map.getProjectionObject(),
                 new OpenLayers.Projection("EPSG:4326")
             );
-            url = url.replace("{latitude}", point.y);
-            url = url.replace("{longitude}", point.x);
+            var url = template.applyTemplate({space_id: space_id, latitude: point.y, longitude: point.x});
             var html = '<iframe width="100%" height="100%" src="'+url+'" style="border: none;"></iframe>';
             return html;
         }
