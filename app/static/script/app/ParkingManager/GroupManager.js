@@ -173,7 +173,7 @@ ParkingManager.GroupManager = Ext.extend(gxp.plugins.Tool, {
                         freehandToggle: false,
                         layerOptions: {
                             styleMap: new OpenLayers.StyleMap(tool.symbolizer)
-                        },
+                        }
                     });
                     OpenLayers.Control.prototype.initialize.apply(this, arguments);
                 }
