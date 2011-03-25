@@ -8,18 +8,18 @@
 
 /** api: (define)
  *  module = ParkingManager
- *  class = AssetEditorPopup
+ *  class = OldAssetEditorPopup
  *  extends = GeoExt.Popup
  */
 
 /** api: constructor
- *  .. class:: AssetEditorPopup(config)
+ *  .. class:: OldAssetEditorPopup(config)
  *
  *      Create a new popup which displays forms for editing parking space
  *      attributes.
  */
 Ext.namespace("ParkingManager");
-ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
+ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
     
     /** i18n **/
     closeMsgTitle: 'Save Changes?',
@@ -147,7 +147,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
              *  deleted (i.e. when the user clicks "Delete" on the popup).
              *
              *  Listener arguments:
-             *  * panel - :class:`ParkingManager.AssetEditorPopup` This popup.
+             *  * panel - :class:`ParkingManager.OldAssetEditorPopup` This popup.
              *  * feature - ``OpenLayers.Feature`` The modified feature.
              */
             "featuremodified",
@@ -157,7 +157,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
              *  "Cancel" button or selecting "No" in the popup's close dialog.
              *  
              *  Listener arguments:
-             *  * panel - :class:`ParkingManager.AssetEditorPopup` This popup.
+             *  * panel - :class:`ParkingManager.OldAssetEditorPopup` This popup.
              *  * feature - ``OpenLayers.Feature`` The feature. Will be null
              *    if editing of a feature that was just inserted was cancelled.
              */
@@ -168,7 +168,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
              *  appears when a popup with unsaved changes is closed.
              *  
              *  Listener arguments:
-             *  * panel - :class:`ParkingManager.AssetEditorPopup` This popup.
+             *  * panel - :class:`ParkingManager.OldAssetEditorPopup` This popup.
              */
             "cancelclose"
         );
@@ -261,7 +261,7 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
             ]
         });
         
-        ParkingManager.AssetEditorPopup.superclass.initComponent.call(this);
+        ParkingManager.OldAssetEditorPopup.superclass.initComponent.call(this);
         
         this.on({
             "show": function() {
@@ -494,4 +494,4 @@ ParkingManager.AssetEditorPopup = Ext.extend(GeoExt.Popup, {
 });
 
 /** api: xtype = app_oldasseteditorpopup */
-Ext.reg('app_oldasseteditorpopup', ParkingManager.AssetEditorPopup);
+Ext.reg('app_oldasseteditorpopup', ParkingManager.OldAssetEditorPopup);
