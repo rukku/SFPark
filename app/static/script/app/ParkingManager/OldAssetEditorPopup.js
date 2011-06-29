@@ -309,7 +309,7 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
             title: this.attributeFormTitle,
             bodyStyle: "padding: 5px 5px 0",
             labelWidth: 100,
-            defaults: {anchor: "98%"},
+            defaults: {anchor: "98%", disabled: true},
             autoScroll: true,
             items: [{
                 xtype: "textfield",
@@ -326,6 +326,7 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
                 displayField: "field1",
                 valueField: "field1",
                 editable: false,
+                triggerAction: 'all',
                 value: attributes.CAP_COLOR
             }, {
                 xtype: "textfield", // use "datefield" if you want to allow editing
@@ -342,6 +343,7 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
             }, {
                 xtype: "combo",
                 name: "SENSOR_FLAG",
+                triggerAction: "all",
                 fieldLabel: "Sensor Flag",
                 store: ["Y", "N"],
                 displayField: "field1",
@@ -390,6 +392,9 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
      */
     startEditing: function() {
         if (!this.editing) {
+            this.attributeForm.getForm().items.each(function(){
+                 this.readOnly !== true && this.enable();
+            });
             this.editing = true;
             this.anc && this.unanchorPopup();
 
