@@ -306,11 +306,20 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
     initAttributeForm: function() {
         var attributes = this.feature.attributes;
         this.attributeForm = new Ext.FormPanel({
+            monitorValid: true,
             title: this.attributeFormTitle,
             bodyStyle: "padding: 5px 5px 0",
             labelWidth: 100,
             defaults: {anchor: "98%", disabled: true},
             autoScroll: true,
+            listeners: {
+                clientvalidation: function(panel, valid) {
+                    if (valid) {
+                        this.setFeatureState(this.getDirtyState());
+                    }
+                },
+                scope: this
+            },
             items: [{
                 xtype: "textfield",
                 name: "POST_ID",
@@ -430,7 +439,6 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
             var feature = this.feature;
             
             var form = this.attributeForm.getForm();
-
             if (feature.state === this.getDirtyState()) {
                 if (save === true) {
                     // apply modified attributes to feature
