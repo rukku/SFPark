@@ -39,7 +39,7 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
     layout: "fit",
     
     /** api: config[feature]
-     *  ``OpenLayers.Feature.Vector`` The feature to edit and display.
+     *  ``GeoExt.data.FeatureRecord`` The feature to edit and display.
      */
     
     /** api: config[vertexRenderIntent]
@@ -172,6 +172,10 @@ ParkingManager.OldAssetEditorPopup = Ext.extend(GeoExt.Popup, {
              */
             "cancelclose"
         );
+        
+        if (this.feature instanceof GeoExt.data.FeatureRecord) {
+            this.feature = this.feature.getFeature();
+        }
         
         var feature = this.feature;
         if (!this.location) {
